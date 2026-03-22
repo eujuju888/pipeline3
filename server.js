@@ -245,21 +245,25 @@ app.post('/api/verify', async (req, res) => {
   try {
     const response = await fetch('https://api.lemonsqueezy.com/v1/licenses/validate', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Bearer ${process.env.LS_API_KEY}`
-      },
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({ license_key: licenseKey })
     });
     const data = await response.json();
-    if (data.valid) {
+    console.log('LS verify response:', JSON.stringify(data)); // debug — remove after testing
+
+    // LemonSqueezy returns { valid: true } on success
+    // or { error: "..." } on failure
+    const isValid = data.valid === true;
+
+    if (isValid) {
       const usage = getUsage(licenseKey);
       return res.json({
         valid: true,
         usage: { used: usage.used, limit: usage.limit, remaining: usage.limit - usage.used }
       });
     } else {
-      return res.json({ valid: false, error: data.error || 'Invalid license key.' });
+      const errMsg = data.error || data.message || 'Invalid license key.';
+      return res.json({ valid: false, error: errMsg });
     }
   } catch (e) {
     return res.json({ valid: false, error: 'Verification failed: ' + e.message });
@@ -300,16 +304,13 @@ app.post('/api/generate', async (req, res) => {
   try {
     const lsRes = await fetch('https://api.lemonsqueezy.com/v1/licenses/validate', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Bearer ${process.env.LS_API_KEY}`
-      },
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({ license_key: licenseKey })
     });
     const lsData = await lsRes.json();
-    if (!lsData.valid) return res.json({ error: 'Invalid license key.' });
+    if (lsData.valid !== true) return res.json({ error: lsData.error || lsData.message || 'Invalid license key.' });
   } catch (e) {
-    return res.json({ error: 'License verification failed.' });
+    return res.json({ error: 'License verification failed: ' + e.message });
   }
 
   // Check usage
