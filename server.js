@@ -282,7 +282,7 @@ async function callClaude(systemPrompt, userPrompt) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 10000,
+      max_tokens: 1400,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }]
     })
@@ -341,31 +341,31 @@ app.post('/api/generate', async (req, res) => {
     const [s1, s2, s3, s4, s5, s6, s7] = await Promise.all([
 
       callClaude(AGENT_AUDITOR,
-        brief + `\n\nAs the Paid Media Auditor, conduct a comprehensive account audit. ${isShort ? 'Provide a concise audit summary.' : 'Cover:'}\n\n1. Account Structure Assessment\n2. Tracking & Measurement Review\n3. Bidding & Budget Evaluation\n4. Keyword & Targeting Analysis\n5. Creative & Ad Copy Review\n6. Competitive Positioning\n7. Priority Fix List (Critical / High / Medium / Low severity)\n8. Estimated efficiency improvement opportunity\n\nUse clear sections. Use real line breaks between items.`
+        brief + `\n\nAs the Paid Media Auditor, conduct a focused account audit. Focus on top 3-4 priorities only. Maximum 3-4 key points per section. Do not provide technical implementation instructions, code, tag setup steps, or platform configuration details. Focus exclusively on business strategy, budget recommendations, and performance outcomes.\n\n1. Account Structure Assessment\n2. Bidding & Budget Evaluation\n3. Competitive Positioning\n4. Priority Fix List (Critical / High only) with estimated efficiency improvement\n\nUse clear sections. Use real line breaks between items.`
       ),
 
       callClaude(AGENT_TRACKING,
-        brief + `\n\nAs the Tracking & Measurement Specialist, conduct a deep tracking audit. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. GTM Container Health\n2. GA4 Event Configuration\n3. Google Ads Conversion Tracking\n4. Meta Pixel & CAPI Setup\n5. Cross-Platform Attribution\n6. Server-Side Tagging Recommendations\n7. Privacy & Consent Compliance\n8. Step-by-step fix instructions\n\nUse real line breaks between items.`
+        brief + `\n\nAs the Tracking & Measurement Specialist, provide a business-focused measurement strategy. Focus on top 3-4 priorities only. Maximum 3-4 key points per section. Do not provide technical implementation instructions, code, tag setup steps, or platform configuration details. Focus exclusively on business strategy, budget recommendations, and performance outcomes.\n\n1. Measurement Gaps & Business Impact\n2. Attribution Strategy & Budget Implications\n3. Key Conversion Events to Prioritise\n4. ROI Tracking Recommendations\n\nUse real line breaks between items.`
       ),
 
       callClaude(AGENT_SEARCH_QUERY,
-        brief + `\n\nAs the Search Query Analyst, perform a search query analysis. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. Wasted Spend Patterns\n2. Negative Keyword Recommendations\n3. Intent Classification Map\n4. Match Type Optimization\n5. Query Sculpting Strategy\n6. High-Intent Keywords to Expand\n7. Estimated wasted spend %\n\nUse real line breaks between items.`
+        brief + `\n\nAs the Search Query Analyst, deliver a focused search strategy. Focus on top 3-4 priorities only. Maximum 3-4 key points per section. Do not provide technical implementation instructions, code, tag setup steps, or platform configuration details. Focus exclusively on business strategy, budget recommendations, and performance outcomes.\n\n1. Wasted Spend Patterns & Estimated % of Budget at Risk\n2. Top Keyword Opportunities to Prioritise\n3. Intent Strategy & Audience Alignment\n4. Budget Reallocation Recommendations\n\nUse real line breaks between items.`
       ),
 
       callClaude(AGENT_PPC,
-        brief + `\n\nAs the PPC Campaign Strategist, build a comprehensive PPC strategy. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. Account Architecture (brand/non-brand/competitor/conquest)\n2. Bidding Strategy Selection with rationale\n3. Budget Allocation Framework\n4. Keyword Strategy & Match Type Approach\n5. Campaign Type Recommendations\n6. Audience Strategy\n7. Cross-Platform Budget Split\n8. 90-Day Optimization Roadmap\n\nInclude RICE scoring table.`
+        brief + `\n\nAs the PPC Campaign Strategist, build a focused PPC strategy. Focus on top 3-4 priorities only. Maximum 3-4 key points per section. Do not provide technical implementation instructions, code, tag setup steps, or platform configuration details. Focus exclusively on business strategy, budget recommendations, and performance outcomes.\n\n1. Campaign Structure & Budget Allocation\n2. Bidding Strategy with Business Rationale\n3. Audience & Targeting Priorities\n4. 90-Day Growth Roadmap with RICE scoring\n\nUse real line breaks between items.`
       ),
 
       callClaude(AGENT_CREATIVE,
-        brief + `\n\nAs the Ad Creative Strategist, develop a complete creative strategy. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. RSA Headline Framework (15 categories)\n2. Sample RSA Headlines (10+ specific examples)\n3. RSA Description Copy (4 variations)\n4. Ad Extension Strategy\n5. Meta Ad Creative Framework\n6. Performance Max Asset Group Recommendations\n7. Creative Testing Plan\n8. Competitive Differentiation\n\nProvide actual ad copy examples.`
+        brief + `\n\nAs the Ad Creative Strategist, deliver a focused creative strategy. Focus on top 3-4 priorities only. Maximum 3-4 key points per section. Do not provide technical implementation instructions, code, tag setup steps, or platform configuration details. Focus exclusively on business strategy, budget recommendations, and performance outcomes.\n\n1. Core Messaging Strategy & Value Proposition\n2. Top Creative Angles & Ad Formats to Prioritise\n3. Creative Testing & Budget Allocation Plan\n4. Competitive Differentiation & Expected Performance Uplift\n\nUse real line breaks between items.`
       ),
 
       callClaude(AGENT_PAID_SOCIAL,
-        brief + `\n\nAs the Paid Social Strategist, design a full-funnel paid social program. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. Platform Selection & Rationale\n2. Full-Funnel Campaign Architecture\n3. Audience Strategy per Platform\n4. Budget Allocation\n5. Creative Format Recommendations\n6. B2B/B2C Tactics\n7. Measurement & Attribution\n8. ROAS / CPL Targets\n\nInclude campaign structure with ad set breakdown.`
+        brief + `\n\nAs the Paid Social Strategist, deliver a focused paid social strategy. Focus on top 3-4 priorities only. Maximum 3-4 key points per section. Do not provide technical implementation instructions, code, tag setup steps, or platform configuration details. Focus exclusively on business strategy, budget recommendations, and performance outcomes.\n\n1. Platform Priorities & Budget Split Rationale\n2. Full-Funnel Audience Strategy\n3. Creative & Messaging Approach per Platform\n4. ROAS / CPL Targets & Performance Benchmarks\n\nUse real line breaks between items.`
       ),
 
       callClaude(AGENT_PROGRAMMATIC,
-        brief + `\n\nAs the Programmatic & Display Buyer, design a display strategy. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. Channel Mix (GDN vs DSP vs Partner Media vs ABM)\n2. Audience-First Buying Strategy\n3. Managed Placement Curation\n4. Partner Media Strategy\n5. ABM Display Program\n6. Creative Formats & Sizes\n7. Brand Safety & Viewability\n8. Budget & CPM Targets\n9. Upper-Funnel Measurement\n\nInclude viewability benchmarks.`
+        brief + `\n\nAs the Programmatic & Display Buyer, deliver a focused display strategy. Focus on top 3-4 priorities only. Maximum 3-4 key points per section. Do not provide technical implementation instructions, code, tag setup steps, or platform configuration details. Focus exclusively on business strategy, budget recommendations, and performance outcomes.\n\n1. Channel Mix & Budget Allocation Rationale\n2. Audience Strategy & Targeting Priorities\n3. Partner Media & Placement Priorities\n4. Upper-Funnel ROI Expectations & CPM Benchmarks\n\nUse real line breaks between items.`
       )
 
     ]);
