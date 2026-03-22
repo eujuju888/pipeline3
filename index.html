@@ -81,7 +81,7 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:13p
 </div>
 <div class="hero">
   <h1>Paid Media<br>Intelligence Report</h1>
-  <p>Seven specialist divisions — Account Health Review · Data &amp; Attribution Audit · Search Intent Analysis · Campaign Architecture · Creative Performance · Social Media Advertising · Programmatic Media Buying</p>
+  <p>Seven specialist divisions — Account Health Review · Data & Attribution Audit · Search Intent Analysis · Campaign Architecture · Creative Performance · Social Media Advertising · Programmatic Media Buying</p>
 </div>
 <div class="stats">
   <div class="stat"><div class="stat-label">Specialists</div><div class="stat-val">7</div></div>
@@ -253,7 +253,6 @@ async function runPipeline(){
   btn.disabled=true;btn.textContent="⏳ Running Pipeline…";
   animateStages();
   try{
-    // 5-minute timeout — parallel Claude calls take ~60s but allow headroom
     const controller=new AbortController();
     const timeoutId=setTimeout(()=>controller.abort(),300000);
     let res;
@@ -270,7 +269,6 @@ async function runPipeline(){
         })
       });
     }finally{clearTimeout(timeoutId);}
-    // Read raw text first — avoids silent JSON parse failures on large payloads
     const raw=await res.text();
     let data;
     try{data=JSON.parse(raw);}
@@ -421,7 +419,6 @@ function openPDF(){
 
   const TH=THEMES[Math.floor(Math.random()*THEMES.length)];
 
-  // Safely escape backticks and ${ sequences so AI output never breaks the template literal
   const safeReport=JSON.stringify(currentReport).replace(/`/g,"\\`").replace(/\$\{/g,"\\${");
   const safeTopic=JSON.stringify(currentTopic).replace(/`/g,"\\`").replace(/\$\{/g,"\\${");
 
