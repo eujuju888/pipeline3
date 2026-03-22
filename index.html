@@ -77,14 +77,14 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:13p
 <body>
 <div class="topbar">
   <span class="topbar-brand">Paid Media Intelligence</span>
-  <span class="topbar-badge">7 AGENTS</span>
+  <span class="topbar-badge">7 SPECIALISTS</span>
 </div>
 <div class="hero">
-  <h1>Paid Media<br>Intelligence Pipeline</h1>
-  <p>Seven specialist agents — Account Audit · Tracking Validation · Search Query Analysis · PPC Strategy · Creative Strategy · Paid Social · Programmatic & Display</p>
+  <h1>Paid Media<br>Intelligence Report</h1>
+  <p>Seven specialist divisions — Account Health Review · Data & Attribution Audit · Search Intent Analysis · Campaign Architecture · Creative Performance · Social Media Advertising · Programmatic Media Buying</p>
 </div>
 <div class="stats">
-  <div class="stat"><div class="stat-label">Agents</div><div class="stat-val">7</div></div>
+  <div class="stat"><div class="stat-label">Specialists</div><div class="stat-val">7</div></div>
   <div class="stat"><div class="stat-label">Sections</div><div class="stat-val">7</div></div>
   <div class="stat"><div class="stat-label">Scoring</div><div class="stat-val">RICE</div></div>
   <div class="stat"><div class="stat-label">Export</div><div class="stat-val">PDF</div></div>
@@ -103,15 +103,15 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:13p
     </div>
   </div>
 
-  <div class="section-title">Pipeline Stages</div>
+  <div class="section-title">Analysis Stages</div>
   <div class="stages-grid">
-    <div class="stage-card"><div class="sc-num" style="color:#f59e0b">📋 Stage 01</div><div class="sc-name">Account Audit</div><div class="sc-desc">200+ checkpoint audit across structure, tracking, bidding, creative, and competitive positioning.</div></div>
-    <div class="stage-card"><div class="sc-num" style="color:#059669">📡 Stage 02</div><div class="sc-name">Tracking & Measurement</div><div class="sc-desc">GTM, GA4, conversion tracking, Meta CAPI, server-side tagging, attribution validation.</div></div>
-    <div class="stage-card"><div class="sc-num" style="color:#7c3aed">🔍 Stage 03</div><div class="sc-name">Search Query Analysis</div><div class="sc-desc">Search term mining, negative keyword architecture, intent mapping, waste elimination.</div></div>
-    <div class="stage-card"><div class="sc-num" style="color:#2563eb">💰 Stage 04</div><div class="sc-name">PPC Campaign Strategy</div><div class="sc-desc">Account architecture, bidding strategy, budget allocation, keyword strategy, cross-platform planning.</div></div>
-    <div class="stage-card"><div class="sc-num" style="color:#dc2626">✍️ Stage 05</div><div class="sc-name">Ad Creative Strategy</div><div class="sc-desc">RSA architecture, Meta creative frameworks, Performance Max assets, creative testing plans.</div></div>
-    <div class="stage-card"><div class="sc-num" style="color:#0891b2">📱 Stage 06</div><div class="sc-name">Paid Social Strategy</div><div class="sc-desc">Full-funnel Meta, LinkedIn, TikTok campaign architecture, audience engineering, ROAS targets.</div></div>
-    <div class="stage-card"><div class="sc-num" style="color:#be185d">📺 Stage 07</div><div class="sc-name">Programmatic & Display</div><div class="sc-desc">GDN, DSP, partner media, ABM display strategy, viewability standards, placement curation.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#f59e0b">📋 Stage 01</div><div class="sc-name">Account Health Review</div><div class="sc-desc">Comprehensive structural evaluation across campaign architecture, bidding efficiency, creative coverage, and competitive positioning.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#059669">📡 Stage 02</div><div class="sc-name">Data & Attribution Audit</div><div class="sc-desc">End-to-end tracking validation covering tag management, conversion accuracy, server-side events, and cross-platform attribution.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#7c3aed">🔍 Stage 03</div><div class="sc-name">Search Intent Analysis</div><div class="sc-desc">Query-level performance review identifying irrelevant spend, intent mismatches, and high-value keyword expansion opportunities.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#2563eb">💰 Stage 04</div><div class="sc-name">Campaign Architecture & Strategy</div><div class="sc-desc">Full account restructuring blueprint covering bidding frameworks, budget allocation, match type strategy, and 90-day growth roadmap.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#dc2626">✍️ Stage 05</div><div class="sc-name">Creative Performance & Messaging</div><div class="sc-desc">Ad copy evaluation, RSA headline architecture, asset group composition, and structured creative testing methodology.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#0891b2">📱 Stage 06</div><div class="sc-name">Social Media Advertising</div><div class="sc-desc">Full-funnel paid social strategy across Meta, LinkedIn, and TikTok with audience segmentation, funnel design, and ROAS benchmarks.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#be185d">📺 Stage 07</div><div class="sc-name">Programmatic Media Buying</div><div class="sc-desc">Display and programmatic strategy spanning GDN, DSP platforms, partner media, ABM targeting, and viewability standards.</div></div>
   </div>
 
   <div class="section-title">Campaign Brief</div>
@@ -132,17 +132,17 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:13p
         <option value="Arabic">🇸🇦 العربية</option>
       </select>
       <select id="fmtSelect">
-        <option value="full">📄 Full 7-agent report</option>
+        <option value="full">📄 Full 7-division report</option>
         <option value="short">📋 Short executive brief</option>
       </select>
     </div>
-    <button class="run-btn" id="runBtn" onclick="runPipeline()">▶ Launch Pipeline</button>
+    <button class="run-btn" id="runBtn" onclick="runPipeline()">▶ Generate Report</button>
     <div class="error-box" id="errorBox"></div>
   </div>
 
   <div class="status-panel" id="statusPanel">
     <div class="status-header">
-      <span class="status-title">Pipeline Status</span>
+      <span class="status-title">Analysis Progress</span>
       <span class="status-count" id="stageCount">0/7 complete</span>
     </div>
     <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
@@ -156,7 +156,7 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:13p
     </div>
     <div class="report-loading" id="reportLoading">
       <div style="font-size:48px;margin-bottom:14px">⏳</div>
-      <div style="color:#dc2626;font-size:20px;font-weight:900;margin-bottom:8px">⚠️ Running full 7-agent pipeline...</div>
+      <div style="color:#dc2626;font-size:20px;font-weight:900;margin-bottom:8px">⚠️ Generating full 7-division report...</div>
       <div style="color:#dc2626;font-size:16px;font-weight:800;margin-bottom:8px">DO NOT close or refresh this window!</div>
       <div style="font-size:13px;color:#64748b">Full report takes 60–90 seconds. Please wait.</div>
     </div>
@@ -171,13 +171,13 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:13p
 
 <script>
 const STAGES=[
-  {emoji:"📋",name:"Account Audit",msg:"Running 200+ checkpoint audit across account structure…"},
-  {emoji:"📡",name:"Tracking & Measurement",msg:"Validating GTM, GA4, conversion tracking & CAPI…"},
-  {emoji:"🔍",name:"Search Query Analysis",msg:"Mining search terms, mapping intent, eliminating waste…"},
-  {emoji:"💰",name:"PPC Campaign Strategy",msg:"Architecting campaign structure & bidding strategy…"},
-  {emoji:"✍️",name:"Ad Creative Strategy",msg:"Building RSA frameworks & creative testing plans…"},
-  {emoji:"📱",name:"Paid Social Strategy",msg:"Designing full-funnel Meta, LinkedIn & TikTok strategy…"},
-  {emoji:"📺",name:"Programmatic & Display",msg:"Planning GDN, DSP, partner media & ABM display…"},
+  {emoji:"📋",name:"Account Health Review",msg:"Evaluating campaign structure, bidding efficiency & competitive positioning…"},
+  {emoji:"📡",name:"Data & Attribution Audit",msg:"Validating conversion tracking, tag management & cross-platform attribution…"},
+  {emoji:"🔍",name:"Search Intent Analysis",msg:"Identifying irrelevant spend, intent gaps & keyword expansion opportunities…"},
+  {emoji:"💰",name:"Campaign Architecture & Strategy",msg:"Designing account structure, bidding framework & budget allocation…"},
+  {emoji:"✍️",name:"Creative Performance & Messaging",msg:"Evaluating ad copy, RSA architecture & creative testing methodology…"},
+  {emoji:"📱",name:"Social Media Advertising",msg:"Building full-funnel paid social strategy across Meta, LinkedIn & TikTok…"},
+  {emoji:"📺",name:"Programmatic Media Buying",msg:"Planning display, DSP, partner media & ABM targeting strategy…"},
 ];
 let verifiedKey=null,currentReport="",currentTopic="",stageTimers=[];
 
@@ -383,7 +383,7 @@ tr.p1 td{background:#fff8e1!important;-webkit-print-color-adjust:exact;print-col
 }
 </style></head><body>
 <div class="no-print" style="background:#1a1a1a;color:#fff;padding:12px 24px;display:flex;align-items:center;position:sticky;top:0;z-index:99;gap:16px">
-  <span style="font-size:13pt;font-weight:700">Paid Media Intelligence — PDF Preview</span>
+  <span style="font-size:13pt;font-weight:700">Paid Media Intelligence — Report Preview</span>
   <span style="font-size:10pt;color:#aaa;margin-left:8px">Theme: ${TH.name}</span>
   <button onclick="window.print()" style="margin-left:auto;background:#2563eb;color:#fff;border:none;padding:10px 24px;border-radius:6px;font-size:12pt;font-weight:700;cursor:pointer">🖨 Print / Save as PDF</button>
 </div>
@@ -393,13 +393,13 @@ const R=${JSON.stringify(currentReport)};
 const T=${JSON.stringify(currentTopic)};
 const D="${today}";
 const SM={
-  "STAGE 01":{n:"1",t:"Account Audit Report",a:"Paid Media Auditor · 200+ Checkpoint Assessment"},
-  "STAGE 02":{n:"2",t:"Tracking & Measurement Audit",a:"Tracking & Measurement Specialist · GTM / GA4 / CAPI"},
-  "STAGE 03":{n:"3",t:"Search Query Analysis",a:"Search Query Analyst · Intent Mapping & Waste Elimination"},
-  "STAGE 04":{n:"4",t:"PPC Campaign Strategy",a:"PPC Campaign Strategist · Account Architecture & Bidding"},
-  "STAGE 05":{n:"5",t:"Ad Creative Strategy",a:"Ad Creative Strategist · RSA & Meta Creative Frameworks"},
-  "STAGE 06":{n:"6",t:"Paid Social Strategy",a:"Paid Social Strategist · Meta / LinkedIn / TikTok"},
-  "STAGE 07":{n:"7",t:"Programmatic & Display Strategy",a:"Programmatic & Display Buyer · GDN / DSP / ABM"}
+  "STAGE 01":{n:"1",t:"Account Health Review",a:"Structural Evaluation · Campaign Efficiency · Competitive Positioning"},
+  "STAGE 02":{n:"2",t:"Data Integrity & Attribution Audit",a:"Tag Management · Conversion Accuracy · Cross-Platform Attribution"},
+  "STAGE 03":{n:"3",t:"Search Intent & Query Performance",a:"Intent Classification · Waste Elimination · Keyword Opportunity Analysis"},
+  "STAGE 04":{n:"4",t:"Campaign Architecture & Growth Strategy",a:"Account Structure · Bidding Framework · Budget Allocation · 90-Day Roadmap"},
+  "STAGE 05":{n:"5",t:"Creative Performance & Messaging Strategy",a:"Ad Copy Evaluation · RSA Architecture · Creative Testing Methodology"},
+  "STAGE 06":{n:"6",t:"Social Media Advertising Strategy",a:"Full-Funnel Social · Audience Engineering · Platform-Specific Execution"},
+  "STAGE 07":{n:"7",t:"Programmatic Media & Display Buying",a:"Display Strategy · DSP Planning · Partner Media · ABM Targeting"}
 };
 function op(c){return "<div class='page'>"+c+"<div class='footer'><span>"+T.substring(0,60)+" · Paid Media Intelligence · Confidential</span><span>"+D+"</span></div></div>";}
 function sh(m){return "<div class='sec-num'>SECTION "+m.n+"</div><div class='sec-title'>"+m.t+"</div><hr class='sec-hr'><div class='sec-agent'>■ "+m.a+"</div>";}

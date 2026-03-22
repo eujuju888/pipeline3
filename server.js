@@ -357,60 +357,60 @@ Generated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'l
 
 EXECUTIVE SUMMARY
 
-This report delivers a comprehensive paid media analysis across 7 specialist agents covering account audit, tracking validation, search query optimization, PPC strategy, creative development, paid social, and programmatic display. Key findings and prioritized recommendations are synthesized below for immediate action.
+This report delivers a comprehensive paid media analysis across 7 specialist divisions covering account health, data integrity, search intent, campaign architecture, creative performance, social media advertising, and programmatic media buying. Key findings and prioritized recommendations are synthesized below for immediate action.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-STAGE 01 — ACCOUNT AUDIT
-📋 Paid Media Auditor · 200+ Checkpoint Assessment
+STAGE 01 — ACCOUNT HEALTH REVIEW
+📋 Structural Evaluation · Campaign Efficiency · Competitive Positioning
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${s1}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-STAGE 02 — TRACKING & MEASUREMENT
-📡 Tracking Specialist · GTM / GA4 / CAPI Validation
+STAGE 02 — DATA INTEGRITY & ATTRIBUTION AUDIT
+📡 Tag Management · Conversion Accuracy · Cross-Platform Attribution
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${s2}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-STAGE 03 — SEARCH QUERY ANALYSIS
-🔍 Search Query Analyst · Intent Mapping & Waste Elimination
+STAGE 03 — SEARCH INTENT & QUERY PERFORMANCE
+🔍 Intent Classification · Waste Elimination · Keyword Opportunity Analysis
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${s3}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-STAGE 04 — PPC CAMPAIGN STRATEGY
-💰 PPC Campaign Strategist · Account Architecture & Bidding
+STAGE 04 — CAMPAIGN ARCHITECTURE & GROWTH STRATEGY
+💰 Account Structure · Bidding Framework · Budget Allocation · 90-Day Roadmap
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${s4}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-STAGE 05 — AD CREATIVE STRATEGY
-✍️ Ad Creative Strategist · RSA & Meta Creative Frameworks
+STAGE 05 — CREATIVE PERFORMANCE & MESSAGING STRATEGY
+✍️ Ad Copy Evaluation · RSA Architecture · Creative Testing Methodology
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${s5}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-STAGE 06 — PAID SOCIAL STRATEGY
-📱 Paid Social Strategist · Meta / LinkedIn / TikTok
+STAGE 06 — SOCIAL MEDIA ADVERTISING STRATEGY
+📱 Full-Funnel Social · Audience Engineering · Platform-Specific Execution
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${s6}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-STAGE 07 — PROGRAMMATIC & DISPLAY STRATEGY
-📺 Programmatic & Display Buyer · GDN / DSP / ABM
+STAGE 07 — PROGRAMMATIC MEDIA & DISPLAY BUYING
+📺 Display Strategy · DSP Planning · Partner Media · ABM Targeting
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${s7}
@@ -437,4 +437,4 @@ END OF REPORT · Paid Media Intelligence · Confidential
 // START SERVER
 // ─────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Paid Media Pipeline running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Paid Media Intelligence running on port ${PORT}`));
