@@ -93,7 +93,7 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:13p
   <div class="license-box" id="licenseBox">
     <span class="license-label" style="display:flex;align-items:center;justify-content:space-between;"><span>🔑 Enter Your License Key</span><a href="https://bsfdataintelligence.lemonsqueezy.com/checkout/buy/ca890555-f598-4448-9729-d6b4ad121b58" target="_blank" style="font-size:10px;font-weight:700;color:#fff;background:#f59e0b;border-radius:6px;padding:3px 10px;text-decoration:none;letter-spacing:.3px;white-space:nowrap;">🛒 Buy License</a></span>
     <div class="license-row">
-      <input class="license-input" id="licenseInput" type="text" placeholder="Enter your LemonSqueezy license key" />
+      <input class="license-input" id="licenseInput" type="password" placeholder="Enter your LemonSqueezy license key" />
       <button class="verify-btn" onclick="verifyLicense()">Verify</button>
     </div>
     <div class="license-status" id="licenseStatus"></div>
@@ -416,24 +416,20 @@ function openPDF(){
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:${TH.fontBody};font-size:11pt;color:#1e1e1e;background:#e5e7eb;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .page{width:210mm;min-height:297mm;background:${TH.pageBackground};margin:16px auto;padding:16mm 18mm 24mm;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.2)}
-/* COVER — merged cover + exec summary + stage 01 hint */
 .cover-navy{background:${TH.coverBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:28px 28px 18px;font-size:24pt;font-weight:800;line-height:1.2;font-family:${TH.fontDisplay}}
 .cover-mid{background:${TH.coverMidBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:14px 28px;font-size:13pt;font-weight:600;font-family:${TH.fontDisplay}}
 .cover-accent{background:${TH.coverAccentBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:${TH.coverAccentColor};padding:12px 28px;font-size:10pt;font-style:italic;line-height:1.6;font-family:${TH.fontBody}}
 .date-line{font-size:9pt;color:#888;font-style:italic;margin-top:14px;font-family:${TH.fontBody}}
 .cover-divider{border:none;border-top:1px solid #ddd;margin:18px 0 14px}
 .cover-exec-label{font-size:8pt;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:${TH.accentColor};margin-bottom:10px;font-family:${TH.fontBody}}
-/* SECTION HEADER */
 .sec-num{font-size:8pt;font-weight:700;color:${TH.secNumColor};margin-bottom:4px;letter-spacing:1.5px;text-transform:uppercase;font-family:${TH.fontBody}}
 .sec-title{font-size:16pt;font-weight:700;color:${TH.secTitleColor};margin-bottom:6px;line-height:1.3;font-family:${TH.fontDisplay}}
 .sec-hr{border:none;border-top:2px solid ${TH.secHrColor};margin-bottom:6px}
 .sec-agent{font-size:8.5pt;color:#777;font-style:italic;margin-bottom:16px;font-family:${TH.fontBody}}
-/* TYPOGRAPHY */
 .body-text{font-size:10.5pt;line-height:1.75;margin-bottom:6px;color:#2a2a2a;font-family:${TH.fontBody}}
 .bullet{font-size:10.5pt;line-height:1.75;margin:3px 0 3px 16px;color:#2a2a2a;font-family:${TH.fontBody}}
 .key-lbl{font-size:10.5pt;font-weight:700;color:${TH.secTitleColor};margin:12px 0 5px;font-family:${TH.fontDisplay}}
 .caption{font-size:9pt;color:#666;font-style:italic;margin-bottom:8px;font-family:${TH.fontBody}}
-/* TABLES */
 table{width:100%;border-collapse:collapse;font-size:9.5pt;margin:8px 0 12px;font-family:${TH.fontBody}}
 th{background:${TH.thBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff!important;padding:7px 8px;font-weight:600;text-align:left;font-size:9pt;letter-spacing:0.04em}
 td{padding:6px 8px;border:1px solid #ccc;vertical-align:top;font-size:9.5pt}
@@ -441,16 +437,12 @@ td.num-cell{font-family:${TH.fontMono};font-size:9pt}
 tr:nth-child(even) td{background:${TH.evenRow}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 tr.p0 td{background:#fdecea!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 tr.p1 td{background:#fff8e1!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-/* PHASE BARS */
 .ph1{background:${TH.ph1Bg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:9px 14px;font-size:10.5pt;font-weight:700;margin:10px 0 5px;font-family:${TH.fontBody}}
 .ph2{background:${TH.ph2Bg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:9px 14px;font-size:10.5pt;font-weight:700;margin:10px 0 5px;font-family:${TH.fontBody}}
 .ph3{background:${TH.ph3Bg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:9px 14px;font-size:10.5pt;font-weight:700;margin:10px 0 5px;font-family:${TH.fontBody}}
-/* EXEC / DISC */
 .exec-hdr{background:${TH.execBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:12px 16px;font-size:13pt;font-weight:700;margin-bottom:14px;font-family:${TH.fontDisplay}}
 .disc-hdr{background:${TH.discBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:12px 16px;font-size:12pt;font-weight:700;margin-bottom:14px;font-family:${TH.fontDisplay}}
-/* FOOTER */
 .footer{background:${TH.footerBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;font-size:7.5pt;padding:0 18mm;display:flex;justify-content:space-between;position:absolute;bottom:0;left:0;right:0;height:24px;align-items:center;font-family:${TH.fontBody};letter-spacing:0.04em}
-/* PRINT */
 .no-print{display:block}
 @media print{
   body{background:#fff}
@@ -487,7 +479,6 @@ function cleanMd(s){
   s=s.replace(/\\*(.*?)\\*/g,"<em>$1<\\/em>");
   return s;
 }
-
 const lines=R.split("\\n");
 let allLines=[];
 let inTable=false;
@@ -496,8 +487,6 @@ let stage01Lines=[];
 let collectingExec=false;
 let collectingS1=false;
 let foundS2=false;
-
-// First pass: extract exec summary and stage 01 content
 for(let i=0;i<lines.length;i++){
   const l=lines[i].trim();
   if(!l) continue;
@@ -507,34 +496,29 @@ for(let i=0;i<lines.length;i++){
   if(collectingExec) execLines.push(lines[i]);
   if(collectingS1&&!foundS2) stage01Lines.push(lines[i]);
 }
-
-// Build merged cover page: Cover + Exec Summary only
 function renderLines(arr){
   let out="";let tbl=false;
   for(const raw of arr){
     const l=raw.trim();
     if(!l){if(tbl){out+="</tbody></table>";tbl=false;}continue;}
     if(l.startsWith("━")||l.startsWith("===")||l.startsWith("---")||l.startsWith("\`\`\`")) continue;
-    // Markdown headings handled by cleanMd — skip other processing
-    if(/^#{1,3}\s+/.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+=cleanMd(l);continue;}
-    if(/phase\s*1.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
-    if(/phase\s*2.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph2'>"+cleanMd(l)+"</div>";continue;}
-    if(/phase\s*3.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph3'>"+cleanMd(l)+"</div>";continue;}
+    if(/^#{1,3}\\s+/.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+=cleanMd(l);continue;}
+    if(/phase\\s*1.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
+    if(/phase\\s*2.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph2'>"+cleanMd(l)+"</div>";continue;}
+    if(/phase\\s*3.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph3'>"+cleanMd(l)+"</div>";continue;}
     if(l.includes("|")&&l.split("|").filter(p=>p.trim()).length>=2){
       const parts=l.split("|").map(p=>p.trim()).filter(p=>p);
       if(!tbl){out+="<table><thead><tr>"+parts.map(p=>"<th>"+cleanMd(p)+"</th>").join("")+"</tr></thead><tbody>";tbl=true;}
       else{const rc=l.toUpperCase().includes("P0")?"p0":l.toUpperCase().includes("P1")?"p1":"";out+="<tr class='"+rc+"'>"+parts.map(p=>"<td>"+cleanMd(p)+"</td>").join("")+"</tr>";}
       continue;
     } else {if(tbl){out+="</tbody></table>";tbl=false;}}
-    if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){out+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•\-]\s*/,"").replace(/^-\s+/,""))+"</div>";continue;}
-    if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\d+\./.test(l))){out+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
+    if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){out+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•\\-]\\s*/,"").replace(/^-\\s+/,""))+"</div>";continue;}
+    if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\\d+\\./.test(l))){out+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
     out+="<div class='body-text'>"+cleanMd(l)+"</div>";
   }
   if(tbl) out+="</tbody></table>";
   return out;
 }
-
-// Merged first page: Cover + Exec Summary only (with spacing between)
 let coverPage=
   "<div class='cover-navy'>PAID MEDIA INTELLIGENCE</div>"+
   "<div class='cover-mid'>Performance Advertising Strategy Report</div>"+
@@ -546,14 +530,10 @@ let coverPage=
   "<div style='margin-top:8px'></div>"+
   "<div class='exec-hdr'>EXECUTIVE SUMMARY</div>"+
   renderLines(execLines);
-
 let html=op(coverPage);
-
-// Remaining stages — Stage 01 now its own page
 let pg="";
 inTable=false;
 let skipUntilS1=true;
-
 for(let i=0;i<lines.length;i++){
   const raw=lines[i];
   const l=raw.trim();
@@ -572,24 +552,22 @@ for(let i=0;i<lines.length;i++){
   }
   if(l.toUpperCase().includes("EXECUTIVE SUMMARY")&&!l.includes("STAGE")){continue;}
   if(l.startsWith("━")||l.startsWith("===")||l.startsWith("---")||l.startsWith("---")||l.startsWith("\`\`\`")) continue;
-  if(/^#{1,3}\s+/.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+=cleanMd(l);continue;}
-  if(/phase\s*1.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
-  if(/phase\s*2.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph2'>"+cleanMd(l)+"</div>";continue;}
-  if(/phase\s*3.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph3'>"+cleanMd(l)+"</div>";continue;}
+  if(/^#{1,3}\\s+/.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+=cleanMd(l);continue;}
+  if(/phase\\s*1.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
+  if(/phase\\s*2.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph2'>"+cleanMd(l)+"</div>";continue;}
+  if(/phase\\s*3.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph3'>"+cleanMd(l)+"</div>";continue;}
   if(l.includes("|")&&l.split("|").filter(p=>p.trim()).length>=2){
     const parts=l.split("|").map(p=>p.trim()).filter(p=>p);
     if(!inTable){pg+="<table><thead><tr>"+parts.map(p=>"<th>"+cleanMd(p)+"</th>").join("")+"</tr></thead><tbody>";inTable=true;}
     else{const rc=l.toUpperCase().includes("P0")?"p0":l.toUpperCase().includes("P1")?"p1":"";pg+="<tr class='"+rc+"'>"+parts.map(p=>"<td>"+cleanMd(p)+"</td>").join("")+"</tr>";}
     continue;
   } else {if(inTable){pg+="</tbody></table>";inTable=false;}}
-  if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){pg+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•\-]\s*/,"").replace(/^-\s+/,""))+"</div>";continue;}
-  if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\d+\./.test(l))){pg+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
+  if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){pg+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•\\-]\\s*/,"").replace(/^-\\s+/,""))+"</div>";continue;}
+  if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\\d+\\./.test(l))){pg+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
   pg+="<div class='body-text'>"+cleanMd(l)+"</div>";
 }
 if(inTable){pg+="</tbody></table>";}
 if(pg)html+=op(pg);
-
-// Disclaimer — new text
 html+=op(
   "<div class='disc-hdr'>DISCLAIMER</div>"+
   "<div class='body-text'>This report is generated by artificial intelligence and is provided for informational purposes only. While efforts have been made to ensure the accuracy of the information, no guarantee is made regarding its completeness, reliability, or accuracy.</div>"+
