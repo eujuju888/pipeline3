@@ -580,16 +580,7 @@ document.getElementById("pb").innerHTML=html;
   const blob=new Blob([html],{type:"text/html"});
   window.open(URL.createObjectURL(blob),"_blank");
 }
-// Auto-restore saved license key on page load
-(function(){
-  try{
-    const saved=localStorage.getItem("pm_license_key");
-    if(saved){
-      document.getElementById("licenseInput").value=saved;
-      verifyLicense();
-    }
-  }catch(e){}
-})();
+
 document.getElementById("licenseInput").addEventListener("keypress",e=>{if(e.key==="Enter")verifyLicense();});
 </script>
 </body>
