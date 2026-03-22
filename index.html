@@ -240,7 +240,7 @@ function showStatus(msg,color){
 async function runPipeline(){
   const topic=document.getElementById("topicInput").value.trim();
   if(!verifiedKey){showError("Please verify your license key first.");return;}
-  if(!topic){showError("Please enter a research topic.");return;}
+  if(!topic){showError("Please enter a campaign brief.");return;}
   document.getElementById("errorBox").classList.remove("show");
   currentTopic=topic;
   document.getElementById("statusPanel").classList.add("show");
@@ -253,18 +253,30 @@ async function runPipeline(){
   btn.disabled=true;btn.textContent="⏳ Running Pipeline…";
   animateStages();
   try{
-    const res=await fetch("/api/generate",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        licenseKey:verifiedKey,
-        topic,
-        language:document.getElementById("langSelect").value,
-        format:document.getElementById("fmtSelect").value
-      })
-    });
-    const data=await res.json().catch(()=>({error:"Server error - invalid response"}));
+    // 5-minute timeout — parallel Claude calls take ~60s but allow headroom
+    const controller=new AbortController();
+    const timeoutId=setTimeout(()=>controller.abort(),300000);
+    let res;
+    try{
+      res=await fetch("/api/generate",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        signal:controller.signal,
+        body:JSON.stringify({
+          licenseKey:verifiedKey,
+          topic,
+          language:document.getElementById("langSelect").value,
+          format:document.getElementById("fmtSelect").value
+        })
+      });
+    }finally{clearTimeout(timeoutId);}
+    // Read raw text first — avoids silent JSON parse failures on large payloads
+    const raw=await res.text();
+    let data;
+    try{data=JSON.parse(raw);}
+    catch(e){showError("Server returned invalid response. Check Railway logs.");document.getElementById("reportLoading").style.display="none";btn.disabled=false;btn.textContent="▶ Generate Report";return;}
     if(data.error){showError(data.error);document.getElementById("reportLoading").style.display="none";btn.disabled=false;btn.textContent="▶ Generate Report";return;}
+    if(!data.report){showError("No report in server response. Check Railway logs.");document.getElementById("reportLoading").style.display="none";btn.disabled=false;btn.textContent="▶ Generate Report";return;}
     currentReport=data.report;
     finishStages();
     if(data.usage){
@@ -276,7 +288,11 @@ async function runPipeline(){
     document.getElementById("reportBody").textContent=currentReport;
     document.getElementById("reportActions").style.display="grid";
     document.getElementById("reportHint").style.display="block";
-  }catch(e){showError("Connection error: "+e.message);document.getElementById("reportLoading").style.display="none";}
+  }catch(e){
+    if(e.name==="AbortError"){showError("Request timed out after 5 minutes. Try the Short executive brief format.");}
+    else{showError("Connection error: "+e.message);}
+    document.getElementById("reportLoading").style.display="none";
+  }
   btn.disabled=false;btn.textContent="▶ Generate Report";
 }
 
