@@ -208,6 +208,8 @@ function finishStages(){
 async function verifyLicense(){
   const key=document.getElementById("licenseInput").value.trim();
   if(!key){showStatus("Please enter your license key","#dc2626");return;}
+  const btn=document.querySelector(".verify-btn");
+  btn.disabled=true;btn.textContent="Checking…";
   showStatus("Verifying…","#2563eb");
   try{
     const res=await fetch("/api/verify",{
@@ -218,18 +220,20 @@ async function verifyLicense(){
     const data=await res.json().catch(()=>({valid:false,error:"Server error"}));
     if(data.valid){
       verifiedKey=key;
+      try{localStorage.setItem("pm_license_key",key);}catch(e){}
       document.getElementById("licenseBox").className="license-box valid";
       showStatus("✅ License verified! You are good to go.","#16a34a");
       document.getElementById("inputSection").classList.add("unlocked");
       const u=data.usage||{};
-      document.getElementById("usageText").textContent="Reports used: "+(u.used||0)+"/"+(u.limit||10)+" — "+(u.remaining??10)+" remaining";
-      document.getElementById("usageFill").style.width=((u.used||0)/(u.limit||10)*100)+"%";
+      document.getElementById("usageText").textContent="Reports used: "+(u.used||0)+"/"+(u.limit||100)+" — "+(u.remaining??100)+" remaining";
+      document.getElementById("usageFill").style.width=((u.used||0)/(u.limit||100)*100)+"%";
       document.getElementById("usageWrap").classList.add("show");
     }else{
       document.getElementById("licenseBox").className="license-box invalid";
       showStatus("❌ "+(data.error||"Invalid license key."),"#dc2626");
     }
   }catch(e){showStatus("❌ Connection error: "+e.message,"#dc2626");}
+  btn.disabled=false;btn.textContent="Verify";
 }
 
 function showStatus(msg,color){
@@ -264,7 +268,7 @@ async function runPipeline(){
       })
     });
     const data=await res.json().catch(()=>({error:"Server error - invalid response"}));
-    if(data.error){showError(data.error);btn.disabled=false;btn.textContent="▶ Generate Report";return;}
+    if(data.error){showError(data.error);document.getElementById("reportLoading").style.display="none";btn.disabled=false;btn.textContent="▶ Generate Report";return;}
     currentReport=data.report;
     finishStages();
     if(data.usage){
@@ -598,6 +602,16 @@ document.getElementById("pb").innerHTML=html;
   const blob=new Blob([html],{type:"text/html"});
   window.open(URL.createObjectURL(blob),"_blank");
 }
+// Auto-restore saved license key on page load
+(function(){
+  try{
+    const saved=localStorage.getItem("pm_license_key");
+    if(saved){
+      document.getElementById("licenseInput").value=saved;
+      verifyLicense();
+    }
+  }catch(e){}
+})();
 document.getElementById("licenseInput").addEventListener("keypress",e=>{if(e.key==="Enter")verifyLicense();});
 </script>
 </body>

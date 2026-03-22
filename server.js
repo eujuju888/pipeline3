@@ -249,11 +249,10 @@ app.post('/api/verify', async (req, res) => {
       body: new URLSearchParams({ license_key: licenseKey })
     });
     const data = await response.json();
-    console.log('LS verify response:', JSON.stringify(data)); // debug — remove after testing
 
-    // LemonSqueezy returns { valid: true } on success
-    // or { error: "..." } on failure
-    const isValid = data.valid === true;
+    // LemonSqueezy returns license_key.status === 'active' on success
+    // On failure: data.error or data.errors array
+    const isValid = data.license_key?.status === 'active' || data.license_key?.status === 'inactive';
 
     if (isValid) {
       const usage = getUsage(licenseKey);
@@ -262,7 +261,7 @@ app.post('/api/verify', async (req, res) => {
         usage: { used: usage.used, limit: usage.limit, remaining: usage.limit - usage.used }
       });
     } else {
-      const errMsg = data.error || data.message || 'Invalid license key.';
+      const errMsg = data.errors?.[0]?.detail || data.error || data.message || 'Invalid license key.';
       return res.json({ valid: false, error: errMsg });
     }
   } catch (e) {
@@ -282,8 +281,7 @@ async function callClaude(systemPrompt, userPrompt) {
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 8000,
+      model: 'claude-sonnet-4-6',
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }]
     })
@@ -320,7 +318,9 @@ app.post('/api/generate', async (req, res) => {
       body: new URLSearchParams({ license_key: licenseKey })
     });
     const lsData = await lsRes.json();
-    if (lsData.valid !== true) return res.json({ error: lsData.error || lsData.message || 'Invalid license key.' });
+    if (lsData.license_key?.status !== 'active' && lsData.license_key?.status !== 'inactive') {
+      return res.json({ error: lsData.errors?.[0]?.detail || lsData.error || lsData.message || 'Invalid license key.' });
+    }
   } catch (e) {
     return res.json({ error: 'License verification failed: ' + e.message });
   }
@@ -331,17 +331,6 @@ app.post('/api/generate', async (req, res) => {
 
   const langNote = language !== 'English' ? ` Respond entirely in ${language}.` : '';
   const isShort = format === 'short';
-
-  // Streaming response — beats Railway's 30s proxy timeout
-  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-  res.setHeader('Transfer-Encoding', 'chunked');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('X-Accel-Buffering', 'no');
-
-  // Keepalive every 5s so Railway proxy doesn't cut the connection
-  const keepAlive = setInterval(() => {
-    try { res.write('KEEPALIVE\n'); } catch(e) {}
-  }, 5000);
 
   try {
     console.log('Pipeline starting:', topic.substring(0, 60));
@@ -380,7 +369,6 @@ app.post('/api/generate', async (req, res) => {
 
     ]);
 
-    clearInterval(keepAlive);
     console.log('All 7 stages done. Chars:', s1.length, s2.length, s3.length, s4.length, s5.length, s6.length, s7.length);
 
     // Final normalization pass — convert any surviving literal \n to real newlines
@@ -422,18 +410,14 @@ app.post('/api/generate', async (req, res) => {
     usage.used += 1;
     console.log('Report chars:', report.length);
 
-    const payload = JSON.stringify({
+    return res.json({
       report,
       usage: { used: usage.used, limit: usage.limit, remaining: usage.limit - usage.used }
     });
-    res.write('END:' + payload + '\n');
-    res.end();
 
   } catch (e) {
-    clearInterval(keepAlive);
     console.error('Pipeline error:', e.message);
-    res.write('END:' + JSON.stringify({ error: 'Pipeline error: ' + e.message }) + '\n');
-    res.end();
+    return res.json({ error: 'Pipeline error: ' + e.message });
   }
 });
 
@@ -447,7 +431,7 @@ app.get('/api/test', async (req, res) => {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-5-20250929', max_tokens: 20, messages: [{ role: 'user', content: 'Say OK' }] })
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 20, messages: [{ role: 'user', content: 'Say OK' }] })
     });
     const d = await r.json();
     if (d.error) return res.json({ ok: false, error: d.error.message });
