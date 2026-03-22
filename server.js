@@ -301,10 +301,30 @@ async function callClaude(systemPrompt, userPrompt) {
 // ─────────────────────────────────────────────
 // MAIN PIPELINE ENDPOINT
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// TEST ENDPOINT — confirm server + Claude API key are alive
+// ─────────────────────────────────────────────
+app.get('/api/test', async (req, res) => {
+  const key = process.env.CLAUDE_API_KEY;
+  if (!key) return res.json({ ok: false, error: 'CLAUDE_API_KEY not set' });
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-5-20250929', max_tokens: 20, messages: [{ role: 'user', content: 'Say OK' }] })
+    });
+    const d = await r.json();
+    if (d.error) return res.json({ ok: false, error: d.error.message, status: r.status });
+    return res.json({ ok: true, reply: d.content?.[0]?.text, model: d.model });
+  } catch (e) {
+    return res.json({ ok: false, error: e.message });
+  }
+});
+
 app.post('/api/generate', async (req, res) => {
-  // Extend timeout to 10 minutes — 7 Claude API calls take 2-5 min total
+  // Extend socket timeout to 10 minutes for parallel Claude API calls
   req.socket.setTimeout(600000);
-  res.setTimeout(600000);
+  req.socket.setKeepAlive(true);
 
   const { licenseKey, topic, language, format } = req.body;
   if (!licenseKey || !topic) return res.json({ error: 'Missing license key or topic.' });
@@ -468,8 +488,10 @@ END OF REPORT · Paid Media Intelligence · Confidential
     });
 
   } catch (e) {
-    console.error('Pipeline error:', e);
-    return res.json({ error: 'Pipeline error: ' + e.message });
+    console.error('Pipeline error:', e.message, e.stack);
+    if (!res.headersSent) {
+      return res.json({ error: 'Pipeline error: ' + e.message });
+    }
   }
 });
 
