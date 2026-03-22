@@ -514,7 +514,7 @@ function renderLines(arr){
   for(const raw of arr){
     const l=raw.trim();
     if(!l){if(tbl){out+="</tbody></table>";tbl=false;}continue;}
-    if(l.startsWith("━")||l.startsWith("===")||l.startsWith("---")) continue;
+    if(l.startsWith("━")||l.startsWith("===")||l.startsWith("---")||l.startsWith("\`\`\`")) continue;
     // Markdown headings handled by cleanMd — skip other processing
     if(/^#{1,3}\s+/.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+=cleanMd(l);continue;}
     if(/phase\s*1.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
@@ -526,7 +526,7 @@ function renderLines(arr){
       else{const rc=l.toUpperCase().includes("P0")?"p0":l.toUpperCase().includes("P1")?"p1":"";out+="<tr class='"+rc+"'>"+parts.map(p=>"<td>"+cleanMd(p)+"</td>").join("")+"</tr>";}
       continue;
     } else {if(tbl){out+="</tbody></table>";tbl=false;}}
-    if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){out+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•]\s*/,"").replace(/^-\s+/,""))+"</div>";continue;}
+    if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){out+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•\-]\s*/,"").replace(/^-\s+/,""))+"</div>";continue;}
     if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\d+\./.test(l))){out+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
     out+="<div class='body-text'>"+cleanMd(l)+"</div>";
   }
@@ -571,7 +571,7 @@ for(let i=0;i<lines.length;i++){
     continue;
   }
   if(l.toUpperCase().includes("EXECUTIVE SUMMARY")&&!l.includes("STAGE")){continue;}
-  if(l.startsWith("━")||l.startsWith("===")||l.startsWith("---")||l.startsWith("---")) continue;
+  if(l.startsWith("━")||l.startsWith("===")||l.startsWith("---")||l.startsWith("---")||l.startsWith("\`\`\`")) continue;
   if(/^#{1,3}\s+/.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+=cleanMd(l);continue;}
   if(/phase\s*1.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
   if(/phase\s*2.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph2'>"+cleanMd(l)+"</div>";continue;}
@@ -582,7 +582,7 @@ for(let i=0;i<lines.length;i++){
     else{const rc=l.toUpperCase().includes("P0")?"p0":l.toUpperCase().includes("P1")?"p1":"";pg+="<tr class='"+rc+"'>"+parts.map(p=>"<td>"+cleanMd(p)+"</td>").join("")+"</tr>";}
     continue;
   } else {if(inTable){pg+="</tbody></table>";inTable=false;}}
-  if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){pg+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•]\s*/,"").replace(/^-\s+/,""))+"</div>";continue;}
+  if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){pg+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•\-]\s*/,"").replace(/^-\s+/,""))+"</div>";continue;}
   if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\d+\./.test(l))){pg+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
   pg+="<div class='body-text'>"+cleanMd(l)+"</div>";
 }
