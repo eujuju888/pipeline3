@@ -280,7 +280,7 @@ async function runPipeline(){
     document.getElementById("reportBody").textContent=currentReport;
     document.getElementById("reportActions").style.display="grid";
     document.getElementById("reportHint").style.display="block";
-  }catch(e){showError("Connection error: "+e.message);}
+  }catch(e){showError("Connection error: "+e.message);document.getElementById("reportLoading").style.display="none";}
   btn.disabled=false;btn.textContent="▶ Generate Report";
 }
 
