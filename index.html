@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paid Media Intelligence Pipeline</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;min-height:100vh}
+.topbar{background:#0a1628;padding:10px 24px;display:flex;align-items:center;justify-content:space-between}
+.topbar-brand{color:#93c5fd;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700}
+.topbar-badge{background:#2c5282;color:#c7d9f5;font-size:10px;padding:3px 10px;border-radius:10px;font-weight:600}
+.hero{background:linear-gradient(135deg,#0a1628 0%,#1e3a5f 60%,#1a4a7a 100%);padding:40px 24px 36px;color:#fff}
+.hero h1{font-size:2.0rem;font-weight:800;line-height:1.2;margin-bottom:10px}
+.hero p{color:#93c5fd;font-size:14px;line-height:1.7;max-width:500px}
+.stats{display:flex;background:#fff;border-bottom:1px solid #cbd5e1}
+.stat{flex:1;padding:10px 16px;border-right:1px solid #cbd5e1}.stat:last-child{border-right:none}
+.stat-label{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.stat-val{font-size:1.2rem;font-weight:800;color:#1e3a5f}
+.main{padding:20px 24px 48px}
+.license-box{background:#fff;border:2px solid #2563eb;border-radius:12px;padding:20px;margin-bottom:16px}
+.license-box.valid{border-color:#16a34a;background:#f0fdf4}
+.license-box.invalid{border-color:#dc2626;background:#fef2f2}
+.license-label{font-size:11px;font-weight:700;color:#0a1628;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;display:block}
+.license-row{display:flex;gap:8px}
+.license-input{flex:1;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none;background:#f8fafc}
+.verify-btn{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer}
+.license-status{margin-top:8px;font-size:13px;display:none}
+.license-status.show{display:block}
+.usage-bar-wrap{margin-top:10px;display:none}.usage-bar-wrap.show{display:block}
+.usage-text{font-size:12px;color:#64748b;margin-bottom:4px}
+.usage-bar{height:6px;background:#e2e8f0;border-radius:4px;overflow:hidden}
+.usage-fill{height:100%;background:linear-gradient(90deg,#16a34a,#2563eb);border-radius:4px;transition:width .5s}
+.input-section{background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:18px;margin-bottom:16px;opacity:.5;pointer-events:none;transition:.3s}
+.input-section.unlocked{opacity:1;pointer-events:all}
+.input-label{font-size:11px;font-weight:700;color:#0a1628;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;display:block}
+textarea{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;resize:vertical;min-height:75px;background:#f8fafc;outline:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#f8fafc;outline:none;color:#1e293b}
+.run-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#2563eb,#1e3a5f);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;margin-top:12px}
+.run-btn:disabled{background:#94a3b8;cursor:not-allowed}
+.error-box{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:10px;border-radius:8px;font-size:13px;margin-top:10px;display:none}
+.error-box.show{display:block}
+.status-panel{background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:14px;margin-bottom:14px;display:none}
+.status-panel.show{display:block}
+.status-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.status-title{font-size:10px;font-weight:700;color:#1e3a5f;letter-spacing:1.5px;text-transform:uppercase}
+.status-count{font-size:10px;color:#64748b}
+.progress-wrap{background:#e2e8f0;border-radius:4px;height:5px;margin-bottom:12px;overflow:hidden}
+.progress-bar{height:100%;background:linear-gradient(90deg,#2563eb,#16a34a);border-radius:4px;transition:width .5s;width:0%}
+.stage-row{display:flex;align-items:center;gap:9px;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:12px}
+.stage-row:last-child{border-bottom:none}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:#e2e8f0}
+.dot.active{background:#2563eb;box-shadow:0 0 6px #2563eb;animation:pulse 1s infinite}
+.dot.done{background:#16a34a}
+.stage-name{min-width:175px;font-weight:600;color:#1e293b}
+.stage-msg{color:#64748b;font-size:11.5px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.report-wrap{display:none}.report-wrap.show{display:block}
+.report-header{background:#0a1628;color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-radius:10px 10px 0 0}
+.report-title{font-size:12px;font-weight:700}
+.report-body{background:#fff;border:1px solid #cbd5e1;border-top:none;padding:18px;font-size:14px;line-height:1.85;color:#1e293b;max-height:600px;overflow-y:auto;white-space:pre-wrap;font-family:monospace;border-radius:0 0 10px 10px}
+.report-loading{padding:32px;text-align:center;background:#fff;border:1px solid #cbd5e1;border-top:none;border-radius:0 0 10px 10px}
+.report-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.btn-copy{padding:11px;background:#dbeafe;color:#1e3a5f;border:1px solid #93c5fd;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer}
+.btn-pdf{padding:11px;background:linear-gradient(135deg,#1a6b2e,#166534);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer}
+.hint{font-size:11.5px;color:#64748b;margin-top:6px;text-align:center}
+.stages-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.stage-card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px}
+.stage-card:last-child{grid-column:1/-1}
+.sc-num{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.sc-name{font-size:12.5px;font-weight:700;color:#0a1628;margin-bottom:3px}
+.sc-desc{font-size:11.5px;color:#64748b;line-height:1.5}
+.section-title{font-size:9.5px;color:#64748b;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:10px;border-bottom:2px solid #dbeafe;padding-bottom:5px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-brand">Paid Media Intelligence</span>
+  <span class="topbar-badge">7 AGENTS</span>
+</div>
+<div class="hero">
+  <h1>Paid Media<br>Intelligence Pipeline</h1>
+  <p>Seven specialist agents — Account Audit · Tracking Validation · Search Query Analysis · PPC Strategy · Creative Strategy · Paid Social · Programmatic & Display</p>
+</div>
+<div class="stats">
+  <div class="stat"><div class="stat-label">Agents</div><div class="stat-val">7</div></div>
+  <div class="stat"><div class="stat-label">Sections</div><div class="stat-val">7</div></div>
+  <div class="stat"><div class="stat-label">Scoring</div><div class="stat-val">RICE</div></div>
+  <div class="stat"><div class="stat-label">Export</div><div class="stat-val">PDF</div></div>
+</div>
+<div class="main">
+  <div class="license-box" id="licenseBox">
+    <span class="license-label" style="display:flex;align-items:center;justify-content:space-between;"><span>🔑 Enter Your License Key</span><a href="https://bsfdataintelligence.lemonsqueezy.com/checkout/buy/ca890555-f598-4448-9729-d6b4ad121b58" target="_blank" style="font-size:10px;font-weight:700;color:#fff;background:#f59e0b;border-radius:6px;padding:3px 10px;text-decoration:none;letter-spacing:.3px;white-space:nowrap;">🛒 Buy License</a></span>
+    <div class="license-row">
+      <input class="license-input" id="licenseInput" type="text" placeholder="Enter your LemonSqueezy license key" />
+      <button class="verify-btn" onclick="verifyLicense()">Verify</button>
+    </div>
+    <div class="license-status" id="licenseStatus"></div>
+    <div class="usage-bar-wrap" id="usageWrap">
+      <div class="usage-text" id="usageText"></div>
+      <div class="usage-bar"><div class="usage-fill" id="usageFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="section-title">Pipeline Stages</div>
+  <div class="stages-grid">
+    <div class="stage-card"><div class="sc-num" style="color:#f59e0b">📋 Stage 01</div><div class="sc-name">Account Audit</div><div class="sc-desc">200+ checkpoint audit across structure, tracking, bidding, creative, and competitive positioning.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#059669">📡 Stage 02</div><div class="sc-name">Tracking & Measurement</div><div class="sc-desc">GTM, GA4, conversion tracking, Meta CAPI, server-side tagging, attribution validation.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#7c3aed">🔍 Stage 03</div><div class="sc-name">Search Query Analysis</div><div class="sc-desc">Search term mining, negative keyword architecture, intent mapping, waste elimination.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#2563eb">💰 Stage 04</div><div class="sc-name">PPC Campaign Strategy</div><div class="sc-desc">Account architecture, bidding strategy, budget allocation, keyword strategy, cross-platform planning.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#dc2626">✍️ Stage 05</div><div class="sc-name">Ad Creative Strategy</div><div class="sc-desc">RSA architecture, Meta creative frameworks, Performance Max assets, creative testing plans.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#0891b2">📱 Stage 06</div><div class="sc-name">Paid Social Strategy</div><div class="sc-desc">Full-funnel Meta, LinkedIn, TikTok campaign architecture, audience engineering, ROAS targets.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#be185d">📺 Stage 07</div><div class="sc-name">Programmatic & Display</div><div class="sc-desc">GDN, DSP, partner media, ABM display strategy, viewability standards, placement curation.</div></div>
+  </div>
+
+  <div class="section-title">Campaign Brief</div>
+  <div class="input-section" id="inputSection">
+    <span class="input-label">Product / Service / Account Description</span>
+    <textarea id="topicInput" placeholder="e.g. SaaS project management tool targeting SMBs — $50K/month Google Ads budget&#10;e.g. DTC skincare brand — scaling Meta ads, struggling with iOS tracking&#10;e.g. B2B cybersecurity software — LinkedIn + Google, $100K monthly spend"></textarea>
+    <div class="row2">
+      <select id="langSelect">
+        <option value="English">🌐 English</option>
+        <option value="Traditional Chinese">🇹🇼 繁體中文</option>
+        <option value="Simplified Chinese">🇨🇳 简体中文</option>
+        <option value="Japanese">🇯🇵 日本語</option>
+        <option value="Korean">🇰🇷 한국어</option>
+        <option value="Spanish">🇪🇸 Español</option>
+        <option value="French">🇫🇷 Français</option>
+        <option value="German">🇩🇪 Deutsch</option>
+        <option value="Portuguese">🇧🇷 Português</option>
+        <option value="Arabic">🇸🇦 العربية</option>
+      </select>
+      <select id="fmtSelect">
+        <option value="full">📄 Full 7-agent report</option>
+        <option value="short">📋 Short executive brief</option>
+      </select>
+    </div>
+    <button class="run-btn" id="runBtn" onclick="runPipeline()">▶ Launch Pipeline</button>
+    <div class="error-box" id="errorBox"></div>
+  </div>
+
+  <div class="status-panel" id="statusPanel">
+    <div class="status-header">
+      <span class="status-title">Pipeline Status</span>
+      <span class="status-count" id="stageCount">0/7 complete</span>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div id="stageList"></div>
+  </div>
+
+  <div class="report-wrap" id="reportWrap">
+    <div class="report-header">
+      <span class="report-title">Paid Media Intelligence Report</span>
+      <div>📋📡🔍💰✍️📱📺</div>
+    </div>
+    <div class="report-loading" id="reportLoading">
+      <div style="font-size:48px;margin-bottom:14px">⏳</div>
+      <div style="color:#dc2626;font-size:20px;font-weight:900;margin-bottom:8px">⚠️ Running full 7-agent pipeline...</div>
+      <div style="color:#dc2626;font-size:16px;font-weight:800;margin-bottom:8px">DO NOT close or refresh this window!</div>
+      <div style="font-size:13px;color:#64748b">Full report takes 60–90 seconds. Please wait.</div>
+    </div>
+    <div class="report-body" id="reportBody" style="display:none"></div>
+    <div class="report-actions" id="reportActions" style="display:none">
+      <button class="btn-copy" onclick="copyReport()">📋 Copy Report</button>
+      <button class="btn-pdf" onclick="openPDF()">🖨 Open PDF Preview</button>
+    </div>
+    <p class="hint" id="reportHint" style="display:none">PDF opens in new tab → Print / Save as PDF</p>
+  </div>
+</div>
+
+<script>
+const STAGES=[
+  {emoji:"📋",name:"Account Audit",msg:"Running 200+ checkpoint audit across account structure…"},
+  {emoji:"📡",name:"Tracking & Measurement",msg:"Validating GTM, GA4, conversion tracking & CAPI…"},
+  {emoji:"🔍",name:"Search Query Analysis",msg:"Mining search terms, mapping intent, eliminating waste…"},
+  {emoji:"💰",name:"PPC Campaign Strategy",msg:"Architecting campaign structure & bidding strategy…"},
+  {emoji:"✍️",name:"Ad Creative Strategy",msg:"Building RSA frameworks & creative testing plans…"},
+  {emoji:"📱",name:"Paid Social Strategy",msg:"Designing full-funnel Meta, LinkedIn & TikTok strategy…"},
+  {emoji:"📺",name:"Programmatic & Display",msg:"Planning GDN, DSP, partner media & ABM display…"},
+];
+let verifiedKey=null,currentReport="",currentTopic="",stageTimers=[];
+
+function renderStages(s,m){
+  document.getElementById("stageList").innerHTML=STAGES.map((st,i)=>
+    '<div class="stage-row"><span class="dot '+s[i]+'"></span><span style="font-size:13px">'+st.emoji+'</span><span class="stage-name">'+st.name+'</span><span class="stage-msg">'+m[i]+'</span></div>'
+  ).join("");
+}
+function animateStages(){
+  stageTimers.forEach(clearTimeout);stageTimers=[];
+  let s=Array(7).fill(""),m=STAGES.map(()=>"Waiting…"),n=0;
+  const tick=()=>{
+    if(n>0){s[n-1]="done";m[n-1]="Complete ✓";}
+    if(n<7){s[n]="active";m[n]=STAGES[n].msg;}
+    renderStages(s,m);
+    document.getElementById("progressBar").style.width=Math.min((n/7)*100,100)+"%";
+    document.getElementById("stageCount").textContent=Math.min(n,7)+"/7 complete";
+    n++;if(n<=7)stageTimers.push(setTimeout(tick,550+Math.random()*300));
+  };tick();
+}
+function finishStages(){
+  stageTimers.forEach(clearTimeout);
+  renderStages(Array(7).fill("done"),Array(7).fill("Complete ✓"));
+  document.getElementById("progressBar").style.width="100%";
+  document.getElementById("stageCount").textContent="7/7 complete";
+}
+
+async function verifyLicense(){
+  const key=document.getElementById("licenseInput").value.trim();
+  if(!key){showStatus("Please enter your license key","#dc2626");return;}
+  showStatus("Verifying…","#2563eb");
+  try{
+    const res=await fetch("/api/verify",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({licenseKey:key})
+    });
+    const data=await res.json().catch(()=>({valid:false,error:"Server error"}));
+    if(data.valid){
+      verifiedKey=key;
+      document.getElementById("licenseBox").className="license-box valid";
+      showStatus("✅ License verified! You are good to go.","#16a34a");
+      document.getElementById("inputSection").classList.add("unlocked");
+      const u=data.usage||{};
+      document.getElementById("usageText").textContent="Reports used: "+(u.used||0)+"/"+(u.limit||10)+" — "+(u.remaining??10)+" remaining";
+      document.getElementById("usageFill").style.width=((u.used||0)/(u.limit||10)*100)+"%";
+      document.getElementById("usageWrap").classList.add("show");
+    }else{
+      document.getElementById("licenseBox").className="license-box invalid";
+      showStatus("❌ "+(data.error||"Invalid license key."),"#dc2626");
+    }
+  }catch(e){showStatus("❌ Connection error: "+e.message,"#dc2626");}
+}
+
+function showStatus(msg,color){
+  const el=document.getElementById("licenseStatus");
+  el.textContent=msg;el.style.color=color;el.classList.add("show");
+}
+
+async function runPipeline(){
+  const topic=document.getElementById("topicInput").value.trim();
+  if(!verifiedKey){showError("Please verify your license key first.");return;}
+  if(!topic){showError("Please enter a campaign brief.");return;}
+  document.getElementById("errorBox").classList.remove("show");
+  currentTopic=topic;
+  document.getElementById("statusPanel").classList.add("show");
+  document.getElementById("reportWrap").classList.add("show");
+  document.getElementById("reportLoading").style.display="block";
+  document.getElementById("reportBody").style.display="none";
+  document.getElementById("reportActions").style.display="none";
+  document.getElementById("reportHint").style.display="none";
+  const btn=document.getElementById("runBtn");
+  btn.disabled=true;btn.textContent="⏳ Running Pipeline…";
+  animateStages();
+  try{
+    const res=await fetch("/api/generate",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        licenseKey:verifiedKey,
+        topic,
+        language:document.getElementById("langSelect").value,
+        format:document.getElementById("fmtSelect").value
+      })
+    });
+    const data=await res.json().catch(()=>({error:"Server error - invalid response"}));
+    if(data.error){showError(data.error);btn.disabled=false;btn.textContent="▶ Launch Pipeline";return;}
+    currentReport=data.report;
+    finishStages();
+    if(data.usage){
+      document.getElementById("usageText").textContent="Reports used: "+data.usage.used+"/"+data.usage.limit+" — "+data.usage.remaining+" remaining";
+      document.getElementById("usageFill").style.width=(data.usage.used/data.usage.limit*100)+"%";
+    }
+    document.getElementById("reportLoading").style.display="none";
+    document.getElementById("reportBody").style.display="block";
+    document.getElementById("reportBody").textContent=currentReport;
+    document.getElementById("reportActions").style.display="grid";
+    document.getElementById("reportHint").style.display="block";
+  }catch(e){showError("Connection error: "+e.message);}
+  btn.disabled=false;btn.textContent="▶ Launch Pipeline";
+}
+
+function showError(msg){
+  const el=document.getElementById("errorBox");el.textContent=msg;el.classList.add("show");
+}
+function copyReport(){navigator.clipboard.writeText(currentReport).catch(()=>{});}
+
+function openPDF(){
+  const today=new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+
+  const THEMES=[
+    {
+      name:"Executive Ivory",
+      gfonts:"https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap",
+      fontDisplay:"'Playfair Display', serif",
+      fontBody:"'DM Sans', sans-serif",
+      fontMono:"'DM Mono', monospace",
+      coverBg:"#1a1a1a",coverMidBg:"#2c2c2c",coverAccentBg:"#3a3a3a",coverAccentColor:"#c9a96e",
+      accentColor:"#c9a96e",secNumColor:"#c9a96e",secTitleColor:"#1a1a1a",secHrColor:"#1a1a1a",
+      thBg:"#1a1a1a",execBg:"#1a1a1a",discBg:"#1a1a1a",footerBg:"#1a1a1a",
+      ph1Bg:"#c0392b",ph2Bg:"#c9a96e",ph3Bg:"#1a1a1a",evenRow:"#faf8f5",pageBackground:"#faf8f5"
+    },
+    {
+      name:"Midnight Slate",
+      gfonts:"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap",
+      fontDisplay:"'Inter', sans-serif",fontBody:"'Inter', sans-serif",fontMono:"'DM Mono', monospace",
+      coverBg:"#0f1218",coverMidBg:"#181c24",coverAccentBg:"#1e2530",coverAccentColor:"#94a3b8",
+      accentColor:"#4a90c4",secNumColor:"#4a90c4",secTitleColor:"#0f1218",secHrColor:"#0f1218",
+      thBg:"#0f1218",execBg:"#0f1218",discBg:"#0f1218",footerBg:"#0f1218",
+      ph1Bg:"#c0392b",ph2Bg:"#e67e22",ph3Bg:"#0f1218",evenRow:"#f0f2f5",pageBackground:"#f0f2f5"
+    },
+    {
+      name:"Arctic Silver",
+      gfonts:"https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap",
+      fontDisplay:"'Playfair Display', serif",fontBody:"'DM Sans', sans-serif",fontMono:"'DM Mono', monospace",
+      coverBg:"#0d1117",coverMidBg:"#161b22",coverAccentBg:"#21262d",coverAccentColor:"#8b949e",
+      accentColor:"#4a90c4",secNumColor:"#4a90c4",secTitleColor:"#0d1117",secHrColor:"#4a90c4",
+      thBg:"#0d1117",execBg:"#0d1117",discBg:"#0d1117",footerBg:"#0d1117",
+      ph1Bg:"#c0392b",ph2Bg:"#e67e22",ph3Bg:"#4a90c4",evenRow:"#eef2f7",pageBackground:"#f0f2f5"
+    },
+    {
+      name:"Parchment Noir",
+      gfonts:"https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap",
+      fontDisplay:"'Libre Baskerville', serif",fontBody:"'DM Sans', sans-serif",fontMono:"'DM Mono', monospace",
+      coverBg:"#1a1710",coverMidBg:"#242018",coverAccentBg:"#2e2920",coverAccentColor:"#c8b98a",
+      accentColor:"#9a8a6a",secNumColor:"#9a8a6a",secTitleColor:"#1a1710",secHrColor:"#1a1710",
+      thBg:"#1a1710",execBg:"#1a1710",discBg:"#1a1710",footerBg:"#1a1710",
+      ph1Bg:"#8a2a1a",ph2Bg:"#9a8a6a",ph3Bg:"#1a1710",evenRow:"#ece6da",pageBackground:"#f2ede4"
+    },
+    {
+      name:"Linen Copper",
+      gfonts:"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap",
+      fontDisplay:"'Cormorant Garamond', serif",fontBody:"'DM Sans', sans-serif",fontMono:"'DM Mono', monospace",
+      coverBg:"#1e1710",coverMidBg:"#2a2018",coverAccentBg:"#362a20",coverAccentColor:"#d4956a",
+      accentColor:"#b5703a",secNumColor:"#b5703a",secTitleColor:"#1e1710",secHrColor:"#b5703a",
+      thBg:"#1e1710",execBg:"#1e1710",discBg:"#1e1710",footerBg:"#1e1710",
+      ph1Bg:"#8a3a1e",ph2Bg:"#b5703a",ph3Bg:"#1e1710",evenRow:"#ede5d8",pageBackground:"#faf7f2"
+    }
+  ];
+
+  const TH=THEMES[Math.floor(Math.random()*THEMES.length)];
+
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Paid Media Intelligence Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="${TH.gfonts}" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:${TH.fontBody};font-size:11pt;color:#1e1e1e;background:#e5e7eb;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;min-height:297mm;background:${TH.pageBackground};margin:16px auto;padding:16mm 18mm 24mm;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.cover-navy{background:${TH.coverBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:28px 28px 18px;font-size:24pt;font-weight:800;line-height:1.2;font-family:${TH.fontDisplay}}
+.cover-mid{background:${TH.coverMidBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:14px 28px;font-size:13pt;font-weight:600;font-family:${TH.fontDisplay}}
+.cover-accent{background:${TH.coverAccentBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:${TH.coverAccentColor};padding:12px 28px;font-size:10pt;font-style:italic;line-height:1.6;font-family:${TH.fontBody}}
+.date-line{font-size:9pt;color:#888;font-style:italic;margin-top:14px;font-family:${TH.fontBody}}
+.cover-divider{border:none;border-top:1px solid #ddd;margin:18px 0 14px}
+.cover-exec-label{font-size:8pt;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:${TH.accentColor};margin-bottom:10px;font-family:${TH.fontBody}}
+.sec-num{font-size:8pt;font-weight:700;color:${TH.secNumColor};margin-bottom:4px;letter-spacing:1.5px;text-transform:uppercase;font-family:${TH.fontBody}}
+.sec-title{font-size:16pt;font-weight:700;color:${TH.secTitleColor};margin-bottom:6px;line-height:1.3;font-family:${TH.fontDisplay}}
+.sec-hr{border:none;border-top:2px solid ${TH.secHrColor};margin-bottom:6px}
+.sec-agent{font-size:8.5pt;color:#777;font-style:italic;margin-bottom:16px;font-family:${TH.fontBody}}
+.body-text{font-size:10.5pt;line-height:1.75;margin-bottom:6px;color:#2a2a2a;font-family:${TH.fontBody}}
+.bullet{font-size:10.5pt;line-height:1.75;margin:3px 0 3px 16px;color:#2a2a2a;font-family:${TH.fontBody}}
+.key-lbl{font-size:10.5pt;font-weight:700;color:${TH.secTitleColor};margin:12px 0 5px;font-family:${TH.fontDisplay}}
+.caption{font-size:9pt;color:#666;font-style:italic;margin-bottom:8px;font-family:${TH.fontBody}}
+table{width:100%;border-collapse:collapse;font-size:9.5pt;margin:8px 0 12px;font-family:${TH.fontBody}}
+th{background:${TH.thBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff!important;padding:7px 8px;font-weight:600;text-align:left;font-size:9pt;letter-spacing:0.04em}
+td{padding:6px 8px;border:1px solid #ccc;vertical-align:top;font-size:9.5pt}
+td.num-cell{font-family:${TH.fontMono};font-size:9pt}
+tr:nth-child(even) td{background:${TH.evenRow}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+tr.p0 td{background:#fdecea!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+tr.p1 td{background:#fff8e1!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ph1{background:${TH.ph1Bg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:9px 14px;font-size:10.5pt;font-weight:700;margin:10px 0 5px;font-family:${TH.fontBody}}
+.ph2{background:${TH.ph2Bg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:9px 14px;font-size:10.5pt;font-weight:700;margin:10px 0 5px;font-family:${TH.fontBody}}
+.ph3{background:${TH.ph3Bg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:9px 14px;font-size:10.5pt;font-weight:700;margin:10px 0 5px;font-family:${TH.fontBody}}
+.exec-hdr{background:${TH.execBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:12px 16px;font-size:13pt;font-weight:700;margin-bottom:14px;font-family:${TH.fontDisplay}}
+.disc-hdr{background:${TH.discBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:12px 16px;font-size:12pt;font-weight:700;margin-bottom:14px;font-family:${TH.fontDisplay}}
+.footer{background:${TH.footerBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;font-size:7.5pt;padding:0 18mm;display:flex;justify-content:space-between;position:absolute;bottom:0;left:0;right:0;height:24px;align-items:center;font-family:${TH.fontBody};letter-spacing:0.04em}
+.no-print{display:block}
+@media print{
+  body{background:#fff}
+  .no-print{display:none!important}
+  .page{page-break-after:always;box-shadow:none;margin:0}
+}
+</style></head><body>
+<div class="no-print" style="background:#1a1a1a;color:#fff;padding:12px 24px;display:flex;align-items:center;position:sticky;top:0;z-index:99;gap:16px">
+  <span style="font-size:13pt;font-weight:700">Paid Media Intelligence — PDF Preview</span>
+  <span style="font-size:10pt;color:#aaa;margin-left:8px">Theme: ${TH.name}</span>
+  <button onclick="window.print()" style="margin-left:auto;background:#2563eb;color:#fff;border:none;padding:10px 24px;border-radius:6px;font-size:12pt;font-weight:700;cursor:pointer">🖨 Print / Save as PDF</button>
+</div>
+<div id="pb"></div>
+<script>
+const R=${JSON.stringify(currentReport)};
+const T=${JSON.stringify(currentTopic)};
+const D="${today}";
+const SM={
+  "STAGE 01":{n:"1",t:"Account Audit Report",a:"Paid Media Auditor · 200+ Checkpoint Assessment"},
+  "STAGE 02":{n:"2",t:"Tracking & Measurement Audit",a:"Tracking & Measurement Specialist · GTM / GA4 / CAPI"},
+  "STAGE 03":{n:"3",t:"Search Query Analysis",a:"Search Query Analyst · Intent Mapping & Waste Elimination"},
+  "STAGE 04":{n:"4",t:"PPC Campaign Strategy",a:"PPC Campaign Strategist · Account Architecture & Bidding"},
+  "STAGE 05":{n:"5",t:"Ad Creative Strategy",a:"Ad Creative Strategist · RSA & Meta Creative Frameworks"},
+  "STAGE 06":{n:"6",t:"Paid Social Strategy",a:"Paid Social Strategist · Meta / LinkedIn / TikTok"},
+  "STAGE 07":{n:"7",t:"Programmatic & Display Strategy",a:"Programmatic & Display Buyer · GDN / DSP / ABM"}
+};
+function op(c){return "<div class='page'>"+c+"<div class='footer'><span>"+T.substring(0,60)+" · Paid Media Intelligence · Confidential</span><span>"+D+"</span></div></div>";}
+function sh(m){return "<div class='sec-num'>SECTION "+m.n+"</div><div class='sec-title'>"+m.t+"</div><hr class='sec-hr'><div class='sec-agent'>■ "+m.a+"</div>";}
+function cleanMd(s){
+  if(/^###\\s+/.test(s)) return "<div class='key-lbl' style='margin-top:14px;font-size:11pt'>"+s.replace(/^###\\s+/,"").replace(/\\*\\*(.*?)\\*\\*/g,"<strong>$1<\\/strong>").replace(/\\*(.*?)\\*/g,"<em>$1<\\/em>")+"<\\/div>";
+  if(/^##\\s+/.test(s)) return "<div class='key-lbl' style='font-size:12pt;margin-top:16px'>"+s.replace(/^##\\s+/,"").replace(/\\*\\*(.*?)\\*\\*/g,"<strong>$1<\\/strong>")+"<\\/div>";
+  if(/^#\\s+/.test(s)) return "<div class='key-lbl' style='font-size:13pt;margin-top:18px'>"+s.replace(/^#\\s+/,"").replace(/\\*\\*(.*?)\\*\\*/g,"<strong>$1<\\/strong>")+"<\\/div>";
+  s=s.replace(/\\*\\*(.*?)\\*\\*/g,"<strong>$1<\\/strong>");
+  s=s.replace(/\\*(.*?)\\*/g,"<em>$1<\\/em>");
+  return s;
+}
+
+const lines=R.split("\\n");
+let allLines=[];
+let inTable=false;
+let execLines=[];
+let stage01Lines=[];
+let collectingExec=false;
+let collectingS1=false;
+let foundS2=false;
+
+for(let i=0;i<lines.length;i++){
+  const l=lines[i].trim();
+  if(!l) continue;
+  if(l.toUpperCase().includes("EXECUTIVE SUMMARY")&&!l.includes("STAGE")){collectingExec=true;collectingS1=false;continue;}
+  if(l.includes("STAGE 01")){collectingExec=false;collectingS1=true;continue;}
+  if(l.includes("STAGE 02")){collectingS1=false;foundS2=true;}
+  if(collectingExec) execLines.push(lines[i]);
+  if(collectingS1&&!foundS2) stage01Lines.push(lines[i]);
+}
+
+function renderLines(arr){
+  let out="";let tbl=false;
+  for(const raw of arr){
+    const l=raw.trim();
+    if(!l){if(tbl){out+="</tbody></table>";tbl=false;}continue;}
+    if(l.startsWith("━")||l.startsWith("===")||l.startsWith("---")) continue;
+    if(/^#{1,3}\\s+/.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+=cleanMd(l);continue;}
+    if(/phase\\s*1.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
+    if(/phase\\s*2.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph2'>"+cleanMd(l)+"</div>";continue;}
+    if(/phase\\s*3.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph3'>"+cleanMd(l)+"</div>";continue;}
+    if(l.includes("|")&&l.split("|").filter(p=>p.trim()).length>=2){
+      const parts=l.split("|").map(p=>p.trim()).filter(p=>p);
+      if(!tbl){out+="<table><thead><tr>"+parts.map(p=>"<th>"+cleanMd(p)+"</th>").join("")+"</tr></thead><tbody>";tbl=true;}
+      else{const rc=l.toUpperCase().includes("P0")?"p0":l.toUpperCase().includes("P1")?"p1":"";out+="<tr class='"+rc+"'>"+parts.map(p=>"<td>"+cleanMd(p)+"</td>").join("")+"</tr>";}
+      continue;
+    } else {if(tbl){out+="</tbody></table>";tbl=false;}}
+    if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){out+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•]\\s*/,"").replace(/^-\\s+/,""))+"</div>";continue;}
+    if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\\d+\\./.test(l))){out+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
+    out+="<div class='body-text'>"+cleanMd(l)+"</div>";
+  }
+  if(tbl) out+="</tbody></table>";
+  return out;
+}
+
+let coverPage=
+  "<div class='cover-navy'>PAID MEDIA INTELLIGENCE</div>"+
+  "<div class='cover-mid'>Performance Advertising Strategy Report</div>"+
+  "<div class='cover-accent'>Campaign Brief: "+T+"</div>"+
+  "<div class='date-line'>Report Date: "+D+" &nbsp;|&nbsp; Confidential — Internal Use</div>"+
+  "<div style='margin-top:32px'></div>"+
+  "<div class='exec-hdr'>EXECUTIVE SUMMARY</div>"+
+  renderLines(execLines);
+
+let html=op(coverPage);
+
+let pg="";
+inTable=false;
+let skipUntilS1=true;
+
+for(let i=0;i<lines.length;i++){
+  const raw=lines[i];
+  const l=raw.trim();
+  if(skipUntilS1){
+    if(l.includes("STAGE 01")) skipUntilS1=false;
+    else continue;
+  }
+  if(!l){if(inTable){pg+="</tbody></table>";inTable=false;}continue;}
+  let sk=null;
+  for(const k of Object.keys(SM)){if(l.includes(k)){sk=k;break;}}
+  if(sk){
+    if(inTable){pg+="</tbody></table>";inTable=false;}
+    if(pg)html+=op(pg);
+    pg=sh(SM[sk]);
+    continue;
+  }
+  if(l.toUpperCase().includes("EXECUTIVE SUMMARY")&&!l.includes("STAGE")){continue;}
+  if(l.startsWith("━")||l.startsWith("===")||l.startsWith("---")||l.startsWith("---")) continue;
+  if(/^#{1,3}\\s+/.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+=cleanMd(l);continue;}
+  if(/phase\\s*1.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
+  if(/phase\\s*2.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph2'>"+cleanMd(l)+"</div>";continue;}
+  if(/phase\\s*3.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph3'>"+cleanMd(l)+"</div>";continue;}
+  if(l.includes("|")&&l.split("|").filter(p=>p.trim()).length>=2){
+    const parts=l.split("|").map(p=>p.trim()).filter(p=>p);
+    if(!inTable){pg+="<table><thead><tr>"+parts.map(p=>"<th>"+cleanMd(p)+"</th>").join("")+"</tr></thead><tbody>";inTable=true;}
+    else{const rc=l.toUpperCase().includes("P0")?"p0":l.toUpperCase().includes("P1")?"p1":"";pg+="<tr class='"+rc+"'>"+parts.map(p=>"<td>"+cleanMd(p)+"</td>").join("")+"</tr>";}
+    continue;
+  } else {if(inTable){pg+="</tbody></table>";inTable=false;}}
+  if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){pg+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•]\\s*/,"").replace(/^-\\s+/,""))+"</div>";continue;}
+  if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\\d+\\./.test(l))){pg+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
+  pg+="<div class='body-text'>"+cleanMd(l)+"</div>";
+}
+if(inTable){pg+="</tbody></table>";}
+if(pg)html+=op(pg);
+
+html+=op(
+  "<div class='disc-hdr'>DISCLAIMER</div>"+
+  "<div class='body-text'>This report is generated by artificial intelligence and is provided for informational purposes only. While efforts have been made to ensure the accuracy of the information, no guarantee is made regarding its completeness, reliability, or accuracy.</div>"+
+  "<div class='body-text' style='margin-top:14px'>This content does not constitute financial, legal, or professional advice. Users are advised to independently verify all information and consult with qualified professionals before making any decisions.</div>"+
+  "<div class='body-text' style='margin-top:14px'>The creator of this report assumes no liability for any losses or damages resulting from the use of this information.</div>"+
+  "<div style='text-align:center;font-size:9pt;color:#888;font-style:italic;margin-top:32px'>Generated: "+D+" · Paid Media Intelligence · Confidential</div>"
+);
+document.getElementById("pb").innerHTML=html;
+<\/script></body></html>`;
+  const blob=new Blob([html],{type:"text/html"});
+  window.open(URL.createObjectURL(blob),"_blank");
+}
+document.getElementById("licenseInput").addEventListener("keypress",e=>{if(e.key==="Enter")verifyLicense();});
+</script>
+</body>
+</html>

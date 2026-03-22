@@ -1,0 +1,18 @@
+{
+  "name": "paid-media-pipeline",
+  "version": "1.0.0",
+  "description": "Paid Media Intelligence Pipeline — 7 specialist agents powered by Claude AI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
