@@ -81,7 +81,7 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:13p
 </div>
 <div class="hero">
   <h1>Paid Media<br>Intelligence Report</h1>
-  <p>Seven specialist divisions — Account Health Review · Data & Attribution Audit · Search Intent Analysis · Campaign Architecture · Creative Performance · Social Media Advertising · Programmatic Media Buying</p>
+  <p>Seven specialist divisions — Account Health Review · Data &amp; Attribution Audit · Search Intent Analysis · Campaign Architecture · Creative Performance · Social Media Advertising · Programmatic Media Buying</p>
 </div>
 <div class="stats">
   <div class="stat"><div class="stat-label">Specialists</div><div class="stat-val">7</div></div>
@@ -106,10 +106,10 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:13p
   <div class="section-title">Analysis Stages</div>
   <div class="stages-grid">
     <div class="stage-card"><div class="sc-num" style="color:#f59e0b">📋 Stage 01</div><div class="sc-name">Account Health Review</div><div class="sc-desc">Comprehensive structural evaluation across campaign architecture, bidding efficiency, creative coverage, and competitive positioning.</div></div>
-    <div class="stage-card"><div class="sc-num" style="color:#059669">📡 Stage 02</div><div class="sc-name">Data & Attribution Audit</div><div class="sc-desc">End-to-end tracking validation covering tag management, conversion accuracy, server-side events, and cross-platform attribution.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#059669">📡 Stage 02</div><div class="sc-name">Data &amp; Attribution Audit</div><div class="sc-desc">End-to-end tracking validation covering tag management, conversion accuracy, server-side events, and cross-platform attribution.</div></div>
     <div class="stage-card"><div class="sc-num" style="color:#7c3aed">🔍 Stage 03</div><div class="sc-name">Search Intent Analysis</div><div class="sc-desc">Query-level performance review identifying irrelevant spend, intent mismatches, and high-value keyword expansion opportunities.</div></div>
-    <div class="stage-card"><div class="sc-num" style="color:#2563eb">💰 Stage 04</div><div class="sc-name">Campaign Architecture & Strategy</div><div class="sc-desc">Full account restructuring blueprint covering bidding frameworks, budget allocation, match type strategy, and 90-day growth roadmap.</div></div>
-    <div class="stage-card"><div class="sc-num" style="color:#dc2626">✍️ Stage 05</div><div class="sc-name">Creative Performance & Messaging</div><div class="sc-desc">Ad copy evaluation, RSA headline architecture, asset group composition, and structured creative testing methodology.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#2563eb">💰 Stage 04</div><div class="sc-name">Campaign Architecture &amp; Strategy</div><div class="sc-desc">Full account restructuring blueprint covering bidding frameworks, budget allocation, match type strategy, and 90-day growth roadmap.</div></div>
+    <div class="stage-card"><div class="sc-num" style="color:#dc2626">✍️ Stage 05</div><div class="sc-name">Creative Performance &amp; Messaging</div><div class="sc-desc">Ad copy evaluation, RSA headline architecture, asset group composition, and structured creative testing methodology.</div></div>
     <div class="stage-card"><div class="sc-num" style="color:#0891b2">📱 Stage 06</div><div class="sc-name">Social Media Advertising</div><div class="sc-desc">Full-funnel paid social strategy across Meta, LinkedIn, and TikTok with audience segmentation, funnel design, and ROAS benchmarks.</div></div>
     <div class="stage-card"><div class="sc-num" style="color:#be185d">📺 Stage 07</div><div class="sc-name">Programmatic Media Buying</div><div class="sc-desc">Display and programmatic strategy spanning GDN, DSP platforms, partner media, ABM targeting, and viewability standards.</div></div>
   </div>
@@ -240,7 +240,7 @@ function showStatus(msg,color){
 async function runPipeline(){
   const topic=document.getElementById("topicInput").value.trim();
   if(!verifiedKey){showError("Please verify your license key first.");return;}
-  if(!topic){showError("Please enter a campaign brief.");return;}
+  if(!topic){showError("Please enter a research topic.");return;}
   document.getElementById("errorBox").classList.remove("show");
   currentTopic=topic;
   document.getElementById("statusPanel").classList.add("show");
@@ -264,7 +264,7 @@ async function runPipeline(){
       })
     });
     const data=await res.json().catch(()=>({error:"Server error - invalid response"}));
-    if(data.error){showError(data.error);btn.disabled=false;btn.textContent="▶ Launch Pipeline";return;}
+    if(data.error){showError(data.error);document.getElementById("reportLoading").style.display="none";btn.disabled=false;btn.textContent="▶ Generate Report";return;}
     currentReport=data.report;
     finishStages();
     if(data.usage){
@@ -276,8 +276,8 @@ async function runPipeline(){
     document.getElementById("reportBody").textContent=currentReport;
     document.getElementById("reportActions").style.display="grid";
     document.getElementById("reportHint").style.display="block";
-  }catch(e){showError("Connection error: "+e.message);}
-  btn.disabled=false;btn.textContent="▶ Launch Pipeline";
+  }catch(e){showError("Connection error: "+e.message);document.getElementById("reportLoading").style.display="none";}
+  btn.disabled=false;btn.textContent="▶ Generate Report";
 }
 
 function showError(msg){
@@ -286,8 +286,10 @@ function showError(msg){
 function copyReport(){navigator.clipboard.writeText(currentReport).catch(()=>{});}
 
 function openPDF(){
+  if(!currentReport){showError("No report generated yet.");return;}
   const today=new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
 
+  // 5 Professional themes with matched font pairs
   const THEMES=[
     {
       name:"Executive Ivory",
@@ -295,50 +297,117 @@ function openPDF(){
       fontDisplay:"'Playfair Display', serif",
       fontBody:"'DM Sans', sans-serif",
       fontMono:"'DM Mono', monospace",
-      coverBg:"#1a1a1a",coverMidBg:"#2c2c2c",coverAccentBg:"#3a3a3a",coverAccentColor:"#c9a96e",
-      accentColor:"#c9a96e",secNumColor:"#c9a96e",secTitleColor:"#1a1a1a",secHrColor:"#1a1a1a",
-      thBg:"#1a1a1a",execBg:"#1a1a1a",discBg:"#1a1a1a",footerBg:"#1a1a1a",
-      ph1Bg:"#c0392b",ph2Bg:"#c9a96e",ph3Bg:"#1a1a1a",evenRow:"#faf8f5",pageBackground:"#faf8f5"
+      coverBg:"#1a1a1a",
+      coverMidBg:"#2c2c2c",
+      coverAccentBg:"#3a3a3a",
+      coverAccentColor:"#c9a96e",
+      accentColor:"#c9a96e",
+      secNumColor:"#c9a96e",
+      secTitleColor:"#1a1a1a",
+      secHrColor:"#1a1a1a",
+      thBg:"#1a1a1a",
+      execBg:"#1a1a1a",
+      discBg:"#1a1a1a",
+      footerBg:"#1a1a1a",
+      ph1Bg:"#c0392b",ph2Bg:"#c9a96e",ph3Bg:"#1a1a1a",
+      evenRow:"#faf8f5",
+      pageBackground:"#faf8f5"
     },
     {
       name:"Midnight Slate",
       gfonts:"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap",
-      fontDisplay:"'Inter', sans-serif",fontBody:"'Inter', sans-serif",fontMono:"'DM Mono', monospace",
-      coverBg:"#0f1218",coverMidBg:"#181c24",coverAccentBg:"#1e2530",coverAccentColor:"#94a3b8",
-      accentColor:"#4a90c4",secNumColor:"#4a90c4",secTitleColor:"#0f1218",secHrColor:"#0f1218",
-      thBg:"#0f1218",execBg:"#0f1218",discBg:"#0f1218",footerBg:"#0f1218",
-      ph1Bg:"#c0392b",ph2Bg:"#e67e22",ph3Bg:"#0f1218",evenRow:"#f0f2f5",pageBackground:"#f0f2f5"
+      fontDisplay:"'Inter', sans-serif",
+      fontBody:"'Inter', sans-serif",
+      fontMono:"'DM Mono', monospace",
+      coverBg:"#0f1218",
+      coverMidBg:"#181c24",
+      coverAccentBg:"#1e2530",
+      coverAccentColor:"#94a3b8",
+      accentColor:"#4a90c4",
+      secNumColor:"#4a90c4",
+      secTitleColor:"#0f1218",
+      secHrColor:"#0f1218",
+      thBg:"#0f1218",
+      execBg:"#0f1218",
+      discBg:"#0f1218",
+      footerBg:"#0f1218",
+      ph1Bg:"#c0392b",ph2Bg:"#e67e22",ph3Bg:"#0f1218",
+      evenRow:"#f0f2f5",
+      pageBackground:"#f0f2f5"
     },
     {
       name:"Arctic Silver",
       gfonts:"https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap",
-      fontDisplay:"'Playfair Display', serif",fontBody:"'DM Sans', sans-serif",fontMono:"'DM Mono', monospace",
-      coverBg:"#0d1117",coverMidBg:"#161b22",coverAccentBg:"#21262d",coverAccentColor:"#8b949e",
-      accentColor:"#4a90c4",secNumColor:"#4a90c4",secTitleColor:"#0d1117",secHrColor:"#4a90c4",
-      thBg:"#0d1117",execBg:"#0d1117",discBg:"#0d1117",footerBg:"#0d1117",
-      ph1Bg:"#c0392b",ph2Bg:"#e67e22",ph3Bg:"#4a90c4",evenRow:"#eef2f7",pageBackground:"#f0f2f5"
+      fontDisplay:"'Playfair Display', serif",
+      fontBody:"'DM Sans', sans-serif",
+      fontMono:"'DM Mono', monospace",
+      coverBg:"#0d1117",
+      coverMidBg:"#161b22",
+      coverAccentBg:"#21262d",
+      coverAccentColor:"#8b949e",
+      accentColor:"#4a90c4",
+      secNumColor:"#4a90c4",
+      secTitleColor:"#0d1117",
+      secHrColor:"#4a90c4",
+      thBg:"#0d1117",
+      execBg:"#0d1117",
+      discBg:"#0d1117",
+      footerBg:"#0d1117",
+      ph1Bg:"#c0392b",ph2Bg:"#e67e22",ph3Bg:"#4a90c4",
+      evenRow:"#eef2f7",
+      pageBackground:"#f0f2f5"
     },
     {
       name:"Parchment Noir",
       gfonts:"https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap",
-      fontDisplay:"'Libre Baskerville', serif",fontBody:"'DM Sans', sans-serif",fontMono:"'DM Mono', monospace",
-      coverBg:"#1a1710",coverMidBg:"#242018",coverAccentBg:"#2e2920",coverAccentColor:"#c8b98a",
-      accentColor:"#9a8a6a",secNumColor:"#9a8a6a",secTitleColor:"#1a1710",secHrColor:"#1a1710",
-      thBg:"#1a1710",execBg:"#1a1710",discBg:"#1a1710",footerBg:"#1a1710",
-      ph1Bg:"#8a2a1a",ph2Bg:"#9a8a6a",ph3Bg:"#1a1710",evenRow:"#ece6da",pageBackground:"#f2ede4"
+      fontDisplay:"'Libre Baskerville', serif",
+      fontBody:"'DM Sans', sans-serif",
+      fontMono:"'DM Mono', monospace",
+      coverBg:"#1a1710",
+      coverMidBg:"#242018",
+      coverAccentBg:"#2e2920",
+      coverAccentColor:"#c8b98a",
+      accentColor:"#9a8a6a",
+      secNumColor:"#9a8a6a",
+      secTitleColor:"#1a1710",
+      secHrColor:"#1a1710",
+      thBg:"#1a1710",
+      execBg:"#1a1710",
+      discBg:"#1a1710",
+      footerBg:"#1a1710",
+      ph1Bg:"#8a2a1a",ph2Bg:"#9a8a6a",ph3Bg:"#1a1710",
+      evenRow:"#ece6da",
+      pageBackground:"#f2ede4"
     },
     {
       name:"Linen Copper",
       gfonts:"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap",
-      fontDisplay:"'Cormorant Garamond', serif",fontBody:"'DM Sans', sans-serif",fontMono:"'DM Mono', monospace",
-      coverBg:"#1e1710",coverMidBg:"#2a2018",coverAccentBg:"#362a20",coverAccentColor:"#d4956a",
-      accentColor:"#b5703a",secNumColor:"#b5703a",secTitleColor:"#1e1710",secHrColor:"#b5703a",
-      thBg:"#1e1710",execBg:"#1e1710",discBg:"#1e1710",footerBg:"#1e1710",
-      ph1Bg:"#8a3a1e",ph2Bg:"#b5703a",ph3Bg:"#1e1710",evenRow:"#ede5d8",pageBackground:"#faf7f2"
+      fontDisplay:"'Cormorant Garamond', serif",
+      fontBody:"'DM Sans', sans-serif",
+      fontMono:"'DM Mono', monospace",
+      coverBg:"#1e1710",
+      coverMidBg:"#2a2018",
+      coverAccentBg:"#362a20",
+      coverAccentColor:"#d4956a",
+      accentColor:"#b5703a",
+      secNumColor:"#b5703a",
+      secTitleColor:"#1e1710",
+      secHrColor:"#b5703a",
+      thBg:"#1e1710",
+      execBg:"#1e1710",
+      discBg:"#1e1710",
+      footerBg:"#1e1710",
+      ph1Bg:"#8a3a1e",ph2Bg:"#b5703a",ph3Bg:"#1e1710",
+      evenRow:"#ede5d8",
+      pageBackground:"#faf7f2"
     }
   ];
 
   const TH=THEMES[Math.floor(Math.random()*THEMES.length)];
+
+  // Safely escape backticks and ${ sequences so AI output never breaks the template literal
+  const safeReport=JSON.stringify(currentReport).replace(/`/g,"\\`").replace(/\$\{/g,"\\${");
+  const safeTopic=JSON.stringify(currentTopic).replace(/`/g,"\\`").replace(/\$\{/g,"\\${");
 
   const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Paid Media Intelligence Report</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -348,20 +417,24 @@ function openPDF(){
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:${TH.fontBody};font-size:11pt;color:#1e1e1e;background:#e5e7eb;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .page{width:210mm;min-height:297mm;background:${TH.pageBackground};margin:16px auto;padding:16mm 18mm 24mm;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+/* COVER — merged cover + exec summary + stage 01 hint */
 .cover-navy{background:${TH.coverBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:28px 28px 18px;font-size:24pt;font-weight:800;line-height:1.2;font-family:${TH.fontDisplay}}
 .cover-mid{background:${TH.coverMidBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:14px 28px;font-size:13pt;font-weight:600;font-family:${TH.fontDisplay}}
 .cover-accent{background:${TH.coverAccentBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:${TH.coverAccentColor};padding:12px 28px;font-size:10pt;font-style:italic;line-height:1.6;font-family:${TH.fontBody}}
 .date-line{font-size:9pt;color:#888;font-style:italic;margin-top:14px;font-family:${TH.fontBody}}
 .cover-divider{border:none;border-top:1px solid #ddd;margin:18px 0 14px}
 .cover-exec-label{font-size:8pt;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:${TH.accentColor};margin-bottom:10px;font-family:${TH.fontBody}}
+/* SECTION HEADER */
 .sec-num{font-size:8pt;font-weight:700;color:${TH.secNumColor};margin-bottom:4px;letter-spacing:1.5px;text-transform:uppercase;font-family:${TH.fontBody}}
 .sec-title{font-size:16pt;font-weight:700;color:${TH.secTitleColor};margin-bottom:6px;line-height:1.3;font-family:${TH.fontDisplay}}
 .sec-hr{border:none;border-top:2px solid ${TH.secHrColor};margin-bottom:6px}
 .sec-agent{font-size:8.5pt;color:#777;font-style:italic;margin-bottom:16px;font-family:${TH.fontBody}}
+/* TYPOGRAPHY */
 .body-text{font-size:10.5pt;line-height:1.75;margin-bottom:6px;color:#2a2a2a;font-family:${TH.fontBody}}
 .bullet{font-size:10.5pt;line-height:1.75;margin:3px 0 3px 16px;color:#2a2a2a;font-family:${TH.fontBody}}
 .key-lbl{font-size:10.5pt;font-weight:700;color:${TH.secTitleColor};margin:12px 0 5px;font-family:${TH.fontDisplay}}
 .caption{font-size:9pt;color:#666;font-style:italic;margin-bottom:8px;font-family:${TH.fontBody}}
+/* TABLES */
 table{width:100%;border-collapse:collapse;font-size:9.5pt;margin:8px 0 12px;font-family:${TH.fontBody}}
 th{background:${TH.thBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff!important;padding:7px 8px;font-weight:600;text-align:left;font-size:9pt;letter-spacing:0.04em}
 td{padding:6px 8px;border:1px solid #ccc;vertical-align:top;font-size:9.5pt}
@@ -369,12 +442,16 @@ td.num-cell{font-family:${TH.fontMono};font-size:9pt}
 tr:nth-child(even) td{background:${TH.evenRow}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 tr.p0 td{background:#fdecea!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 tr.p1 td{background:#fff8e1!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+/* PHASE BARS */
 .ph1{background:${TH.ph1Bg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:9px 14px;font-size:10.5pt;font-weight:700;margin:10px 0 5px;font-family:${TH.fontBody}}
 .ph2{background:${TH.ph2Bg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:9px 14px;font-size:10.5pt;font-weight:700;margin:10px 0 5px;font-family:${TH.fontBody}}
 .ph3{background:${TH.ph3Bg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:9px 14px;font-size:10.5pt;font-weight:700;margin:10px 0 5px;font-family:${TH.fontBody}}
+/* EXEC / DISC */
 .exec-hdr{background:${TH.execBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:12px 16px;font-size:13pt;font-weight:700;margin-bottom:14px;font-family:${TH.fontDisplay}}
 .disc-hdr{background:${TH.discBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:12px 16px;font-size:12pt;font-weight:700;margin-bottom:14px;font-family:${TH.fontDisplay}}
+/* FOOTER */
 .footer{background:${TH.footerBg}!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;font-size:7.5pt;padding:0 18mm;display:flex;justify-content:space-between;position:absolute;bottom:0;left:0;right:0;height:24px;align-items:center;font-family:${TH.fontBody};letter-spacing:0.04em}
+/* PRINT */
 .no-print{display:block}
 @media print{
   body{background:#fff}
@@ -389,8 +466,8 @@ tr.p1 td{background:#fff8e1!important;-webkit-print-color-adjust:exact;print-col
 </div>
 <div id="pb"></div>
 <script>
-const R=${JSON.stringify(currentReport)};
-const T=${JSON.stringify(currentTopic)};
+const R=${safeReport};
+const T=${safeTopic};
 const D="${today}";
 const SM={
   "STAGE 01":{n:"1",t:"Account Health Review",a:"Structural Evaluation · Campaign Efficiency · Competitive Positioning"},
@@ -421,6 +498,7 @@ let collectingExec=false;
 let collectingS1=false;
 let foundS2=false;
 
+// First pass: extract exec summary and stage 01 content
 for(let i=0;i<lines.length;i++){
   const l=lines[i].trim();
   if(!l) continue;
@@ -431,58 +509,51 @@ for(let i=0;i<lines.length;i++){
   if(collectingS1&&!foundS2) stage01Lines.push(lines[i]);
 }
 
+// Build merged cover page: Cover + Exec Summary only
 function renderLines(arr){
-  let out="";let tbl=false;let inCode=false;let codeBuf="";
+  let out="";let tbl=false;
   for(const raw of arr){
     const l=raw.trim();
-    // CODE BLOCK HANDLING
-    if(l.startsWith("```")){
-      if(!inCode){
-        if(tbl){out+="</tbody></table>";tbl=false;}
-        inCode=true;codeBuf="";
-      } else {
-        out+="<pre style='background:#1e1e1e;color:#d4d4d4;padding:10px 14px;font-size:8.5pt;line-height:1.55;border-radius:4px;margin:8px 0 10px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace'>"+codeBuf.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</pre>";
-        inCode=false;codeBuf="";
-      }
-      continue;
-    }
-    if(inCode){codeBuf+=(codeBuf?"\n":"")+raw;continue;}
     if(!l){if(tbl){out+="</tbody></table>";tbl=false;}continue;}
     if(l.startsWith("━")||l.startsWith("===")||l.startsWith("---")) continue;
-    if(/^#{1,3}\\s+/.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+=cleanMd(l);continue;}
-    if(/phase\\s*1.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
-    if(/phase\\s*2.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph2'>"+cleanMd(l)+"</div>";continue;}
-    if(/phase\\s*3.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph3'>"+cleanMd(l)+"</div>";continue;}
+    // Markdown headings handled by cleanMd — skip other processing
+    if(/^#{1,3}\s+/.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+=cleanMd(l);continue;}
+    if(/phase\s*1.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
+    if(/phase\s*2.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph2'>"+cleanMd(l)+"</div>";continue;}
+    if(/phase\s*3.*day/i.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+="<div class='ph3'>"+cleanMd(l)+"</div>";continue;}
     if(l.includes("|")&&l.split("|").filter(p=>p.trim()).length>=2){
       const parts=l.split("|").map(p=>p.trim()).filter(p=>p);
       if(!tbl){out+="<table><thead><tr>"+parts.map(p=>"<th>"+cleanMd(p)+"</th>").join("")+"</tr></thead><tbody>";tbl=true;}
       else{const rc=l.toUpperCase().includes("P0")?"p0":l.toUpperCase().includes("P1")?"p1":"";out+="<tr class='"+rc+"'>"+parts.map(p=>"<td>"+cleanMd(p)+"</td>").join("")+"</tr>";}
       continue;
     } else {if(tbl){out+="</tbody></table>";tbl=false;}}
-    if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){out+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•]\\s*/,"").replace(/^-\\s+/,""))+"</div>";continue;}
-    if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\\d+\\./.test(l))){out+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
+    if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){out+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•]\s*/,"").replace(/^-\s+/,""))+"</div>";continue;}
+    if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\d+\./.test(l))){out+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
     out+="<div class='body-text'>"+cleanMd(l)+"</div>";
   }
   if(tbl) out+="</tbody></table>";
-  if(inCode&&codeBuf) out+="<pre style='background:#1e1e1e;color:#d4d4d4;padding:10px 14px;font-size:8.5pt;line-height:1.55;border-radius:4px;margin:8px 0 10px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace'>"+codeBuf.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</pre>";
   return out;
 }
 
+// Merged first page: Cover + Exec Summary only (with spacing between)
 let coverPage=
   "<div class='cover-navy'>PAID MEDIA INTELLIGENCE</div>"+
   "<div class='cover-mid'>Performance Advertising Strategy Report</div>"+
   "<div class='cover-accent'>Campaign Brief: "+T+"</div>"+
   "<div class='date-line'>Report Date: "+D+" &nbsp;|&nbsp; Confidential — Internal Use</div>"+
   "<div style='margin-top:32px'></div>"+
+  "<div style='margin-top:8px'></div>"+
+  "<div style='margin-top:8px'></div>"+
+  "<div style='margin-top:8px'></div>"+
   "<div class='exec-hdr'>EXECUTIVE SUMMARY</div>"+
   renderLines(execLines);
 
 let html=op(coverPage);
 
+// Remaining stages — Stage 01 now its own page
 let pg="";
 inTable=false;
 let skipUntilS1=true;
-let inCodeBlock=false;let codeBuffer="";
 
 for(let i=0;i<lines.length;i++){
   const raw=lines[i];
@@ -491,18 +562,6 @@ for(let i=0;i<lines.length;i++){
     if(l.includes("STAGE 01")) skipUntilS1=false;
     else continue;
   }
-  // CODE BLOCK DETECTION
-  if(l.startsWith("```")){
-    if(!inCodeBlock){
-      if(inTable){pg+="</tbody></table>";inTable=false;}
-      inCodeBlock=true;codeBuffer="";
-    } else {
-      pg+="<pre style='background:#1e1e1e;color:#d4d4d4;padding:10px 14px;font-size:8.5pt;line-height:1.55;border-radius:4px;margin:8px 0 10px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace'>"+codeBuffer.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</pre>";
-      inCodeBlock=false;codeBuffer="";
-    }
-    continue;
-  }
-  if(inCodeBlock){codeBuffer+=(codeBuffer?"\n":"")+raw;continue;}
   if(!l){if(inTable){pg+="</tbody></table>";inTable=false;}continue;}
   let sk=null;
   for(const k of Object.keys(SM)){if(l.includes(k)){sk=k;break;}}
@@ -514,24 +573,24 @@ for(let i=0;i<lines.length;i++){
   }
   if(l.toUpperCase().includes("EXECUTIVE SUMMARY")&&!l.includes("STAGE")){continue;}
   if(l.startsWith("━")||l.startsWith("===")||l.startsWith("---")||l.startsWith("---")) continue;
-  if(/^#{1,3}\\s+/.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+=cleanMd(l);continue;}
-  if(/phase\\s*1.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
-  if(/phase\\s*2.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph2'>"+cleanMd(l)+"</div>";continue;}
-  if(/phase\\s*3.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph3'>"+cleanMd(l)+"</div>";continue;}
+  if(/^#{1,3}\s+/.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+=cleanMd(l);continue;}
+  if(/phase\s*1.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph1'>"+cleanMd(l)+"</div>";continue;}
+  if(/phase\s*2.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph2'>"+cleanMd(l)+"</div>";continue;}
+  if(/phase\s*3.*day/i.test(l)){if(inTable){pg+="</tbody></table>";inTable=false;}pg+="<div class='ph3'>"+cleanMd(l)+"</div>";continue;}
   if(l.includes("|")&&l.split("|").filter(p=>p.trim()).length>=2){
     const parts=l.split("|").map(p=>p.trim()).filter(p=>p);
     if(!inTable){pg+="<table><thead><tr>"+parts.map(p=>"<th>"+cleanMd(p)+"</th>").join("")+"</tr></thead><tbody>";inTable=true;}
     else{const rc=l.toUpperCase().includes("P0")?"p0":l.toUpperCase().includes("P1")?"p1":"";pg+="<tr class='"+rc+"'>"+parts.map(p=>"<td>"+cleanMd(p)+"</td>").join("")+"</tr>";}
     continue;
   } else {if(inTable){pg+="</tbody></table>";inTable=false;}}
-  if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){pg+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•]\\s*/,"").replace(/^-\\s+/,""))+"</div>";continue;}
-  if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\\d+\\./.test(l))){pg+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
+  if(l.startsWith("●")||l.startsWith("•")||l.startsWith("- ")){pg+="<div class='bullet'>• "+cleanMd(l.replace(/^[●•]\s*/,"").replace(/^-\s+/,""))+"</div>";continue;}
+  if((l.length<120&&l.endsWith(":")&&!l.includes("|"))||(l.length<80&&/^\d+\./.test(l))){pg+="<div class='key-lbl'>"+cleanMd(l)+"</div>";continue;}
   pg+="<div class='body-text'>"+cleanMd(l)+"</div>";
 }
 if(inTable){pg+="</tbody></table>";}
-if(inCodeBlock&&codeBuffer){pg+="<pre style='background:#1e1e1e;color:#d4d4d4;padding:10px 14px;font-size:8.5pt;line-height:1.55;border-radius:4px;margin:8px 0 10px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace'>"+codeBuffer.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</pre>";}
 if(pg)html+=op(pg);
 
+// Disclaimer — new text
 html+=op(
   "<div class='disc-hdr'>DISCLAIMER</div>"+
   "<div class='body-text'>This report is generated by artificial intelligence and is provided for informational purposes only. While efforts have been made to ensure the accuracy of the information, no guarantee is made regarding its completeness, reliability, or accuracy.</div>"+
