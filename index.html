@@ -514,7 +514,7 @@ function cleanMd(s){
   return s;
 }
 
-const lines=R.split("\\n");
+const lines=R.replace(/\\\\n/g,"\n").split("\n");
 let allLines=[];
 let inTable=false;
 let execLines=[];

@@ -1,8 +1,7 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
 // ─────────────────────────────────────────────
@@ -296,33 +295,16 @@ async function callClaude(systemPrompt, userPrompt) {
   const data = await response.json();
   if (data.error) throw new Error(data.error.message || 'Claude API error');
   if (!data.content || !data.content[0]) throw new Error('Empty response from Claude API');
-  // Normalize any literal \n escape sequences Claude may include
-  return data.content[0].text.replace(/\\n/g, '\n');
+  // Normalize literal \n sequences into real newlines (loop handles all depths)
+  let text = data.content[0].text;
+  let prev = '';
+  while (prev !== text) { prev = text; text = text.split('\\n').join('\n'); }
+  return text;
 }
 
 // ─────────────────────────────────────────────
 // MAIN PIPELINE ENDPOINT
 // ─────────────────────────────────────────────
-// ─────────────────────────────────────────────
-// TEST ENDPOINT — confirm server + Claude API key are alive
-// ─────────────────────────────────────────────
-app.get('/api/test', async (req, res) => {
-  const key = process.env.CLAUDE_API_KEY;
-  if (!key) return res.json({ ok: false, error: 'CLAUDE_API_KEY not set' });
-  try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-5-20250929', max_tokens: 20, messages: [{ role: 'user', content: 'Say OK' }] })
-    });
-    const d = await r.json();
-    if (d.error) return res.json({ ok: false, error: d.error.message, status: r.status });
-    return res.json({ ok: true, reply: d.content?.[0]?.text, model: d.model });
-  } catch (e) {
-    return res.json({ ok: false, error: e.message });
-  }
-});
-
 app.post('/api/generate', async (req, res) => {
   req.socket.setTimeout(600000);
   req.socket.setKeepAlive(true);
@@ -349,132 +331,97 @@ app.post('/api/generate', async (req, res) => {
 
   const langNote = language !== 'English' ? ` Respond entirely in ${language}.` : '';
   const isShort = format === 'short';
-  const formatNote = `\n\nFORMATTING RULES (strictly follow):
-- Do NOT use markdown code blocks or backticks anywhere
-- Use bullet points (•) for lists
-- Use plain text headers like "1. SECTION NAME:" for sections
-- Keep all content as readable plain text only`;
 
-  // ── STREAMING RESPONSE ──
-  // Railway proxy kills connections after 30s — we beat it by streaming chunks
-  // The frontend accumulates chunks and parses when it sees the END marker
+  // Streaming response — beats Railway's 30s proxy timeout
   res.setHeader('Content-Type', 'text/plain; charset=utf-8');
   res.setHeader('Transfer-Encoding', 'chunked');
   res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('X-Accel-Buffering', 'no'); // disable nginx buffering on Railway
+  res.setHeader('X-Accel-Buffering', 'no');
 
-  // Send a keepalive comment every 5s so Railway proxy doesn't timeout
+  // Keepalive every 5s so Railway proxy doesn't cut the connection
   const keepAlive = setInterval(() => {
     try { res.write('KEEPALIVE\n'); } catch(e) {}
   }, 5000);
 
   try {
-    console.log('Pipeline starting for topic:', topic.substring(0, 80));
-    console.log('Launching all 7 stages in parallel...');
+    console.log('Pipeline starting:', topic.substring(0, 60));
 
-    const briefBase = \`Campaign Brief: \${topic}\${langNote}\${formatNote}\`;
+    const brief = `Campaign Brief: ${topic}${langNote}`;
 
     const [s1, s2, s3, s4, s5, s6, s7] = await Promise.all([
 
       callClaude(AGENT_AUDITOR,
-        briefBase + \`\n\nAs the Paid Media Auditor, conduct a comprehensive account audit. \${isShort ? 'Provide a concise audit summary.' : 'Cover:'}\n\n1. Account Structure Assessment\n2. Tracking & Measurement Review\n3. Bidding & Budget Evaluation\n4. Keyword & Targeting Analysis\n5. Creative & Ad Copy Review\n6. Competitive Positioning\n7. Priority Fix List (Critical / High / Medium / Low severity)\n8. Estimated efficiency improvement opportunity\n\nFormat with clear sections and actionable findings.\`
+        brief + `\n\nAs the Paid Media Auditor, conduct a comprehensive account audit. ${isShort ? 'Provide a concise audit summary.' : 'Cover:'}\n\n1. Account Structure Assessment\n2. Tracking & Measurement Review\n3. Bidding & Budget Evaluation\n4. Keyword & Targeting Analysis\n5. Creative & Ad Copy Review\n6. Competitive Positioning\n7. Priority Fix List (Critical / High / Medium / Low severity)\n8. Estimated efficiency improvement opportunity\n\nUse clear sections. Use real line breaks between items.`
       ),
 
       callClaude(AGENT_TRACKING,
-        briefBase + \`\n\nAs the Tracking & Measurement Specialist, conduct a deep tracking audit. \${isShort ? 'Provide a concise tracking summary.' : 'Cover:'}\n\n1. GTM Container Health Assessment\n2. GA4 Event Configuration Review\n3. Google Ads Conversion Tracking Audit\n4. Meta Pixel & CAPI Setup Evaluation\n5. Cross-Platform Attribution Analysis\n6. Server-Side Tagging Recommendations\n7. Privacy & Consent Compliance Review\n8. Specific fixes with step-by-step implementation instructions\n\nFlag any tracking issues that are actively misleading bidding algorithms.\`
+        brief + `\n\nAs the Tracking & Measurement Specialist, conduct a deep tracking audit. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. GTM Container Health\n2. GA4 Event Configuration\n3. Google Ads Conversion Tracking\n4. Meta Pixel & CAPI Setup\n5. Cross-Platform Attribution\n6. Server-Side Tagging Recommendations\n7. Privacy & Consent Compliance\n8. Step-by-step fix instructions\n\nUse real line breaks between items.`
       ),
 
       callClaude(AGENT_SEARCH_QUERY,
-        briefBase + \`\n\nAs the Search Query Analyst, perform a thorough search query analysis. \${isShort ? 'Provide a concise query analysis.' : 'Cover:'}\n\n1. Likely Wasted Spend Patterns (irrelevant query categories for this business)\n2. Negative Keyword Recommendations (account/campaign/ad group level lists)\n3. Intent Classification Map (informational vs commercial vs transactional)\n4. Match Type Optimization Recommendations\n5. Query Sculpting Strategy\n6. High-Intent Opportunity Keywords to Expand\n7. Estimated wasted spend percentage to recover\n\nProvide specific negative keyword lists and match type guidance.\`
+        brief + `\n\nAs the Search Query Analyst, perform a search query analysis. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. Wasted Spend Patterns\n2. Negative Keyword Recommendations\n3. Intent Classification Map\n4. Match Type Optimization\n5. Query Sculpting Strategy\n6. High-Intent Keywords to Expand\n7. Estimated wasted spend %\n\nUse real line breaks between items.`
       ),
 
       callClaude(AGENT_PPC,
-        briefBase + \`\n\nAs the PPC Campaign Strategist, build a comprehensive PPC strategy. \${isShort ? 'Provide a concise PPC strategy.' : 'Cover:'}\n\n1. Recommended Account Architecture (campaign tiers: brand/non-brand/competitor/conquest)\n2. Bidding Strategy Selection (tCPA vs tROAS vs Max Conversions — with rationale)\n3. Budget Allocation Framework across campaigns\n4. Keyword Strategy & Match Type Approach\n5. Campaign Type Recommendations (Search vs PMax vs Shopping)\n6. Audience Strategy (Customer Match, in-market, remarketing)\n7. Cross-Platform Budget Split (Google / Microsoft / Amazon)\n8. 90-Day Optimization Roadmap\n\nInclude RICE scoring table for prioritized actions.\`
+        brief + `\n\nAs the PPC Campaign Strategist, build a comprehensive PPC strategy. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. Account Architecture (brand/non-brand/competitor/conquest)\n2. Bidding Strategy Selection with rationale\n3. Budget Allocation Framework\n4. Keyword Strategy & Match Type Approach\n5. Campaign Type Recommendations\n6. Audience Strategy\n7. Cross-Platform Budget Split\n8. 90-Day Optimization Roadmap\n\nInclude RICE scoring table.`
       ),
 
       callClaude(AGENT_CREATIVE,
-        briefBase + \`\n\nAs the Ad Creative Strategist, develop a complete creative strategy. \${isShort ? 'Provide a concise creative strategy.' : 'Cover:'}\n\n1. RSA Headline Framework (15 headline categories: brand/benefit/feature/CTA/social proof)\n2. Sample RSA Headlines (at least 10 specific headlines with character counts)\n3. RSA Description Copy (4 description variations)\n4. Ad Extension Strategy (sitelinks, callouts, structured snippets)\n5. Meta Ad Creative Framework (hook-body-CTA structure)\n6. Performance Max Asset Group Recommendations\n7. Creative Testing Plan (what to test, success criteria, timeline)\n8. Competitive Creative Differentiation Strategy\n\nProvide actual ad copy examples, not just guidelines.\`
+        brief + `\n\nAs the Ad Creative Strategist, develop a complete creative strategy. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. RSA Headline Framework (15 categories)\n2. Sample RSA Headlines (10+ specific examples)\n3. RSA Description Copy (4 variations)\n4. Ad Extension Strategy\n5. Meta Ad Creative Framework\n6. Performance Max Asset Group Recommendations\n7. Creative Testing Plan\n8. Competitive Differentiation\n\nProvide actual ad copy examples.`
       ),
 
       callClaude(AGENT_PAID_SOCIAL,
-        briefBase + \`\n\nAs the Paid Social Strategist, design a full-funnel paid social program. \${isShort ? 'Provide a concise social strategy.' : 'Cover:'}\n\n1. Platform Selection & Rationale (Meta vs LinkedIn vs TikTok vs others)\n2. Full-Funnel Campaign Architecture (Prospecting → Engagement → Retargeting → Retention)\n3. Audience Strategy per Platform (custom audiences, lookalikes, exclusions)\n4. Budget Allocation Across Platforms & Funnel Stages\n5. Creative Format Recommendations per Platform\n6. B2B/B2C Specific Tactics (ABM if applicable)\n7. Measurement & Attribution Setup\n8. ROAS / CPL Targets by Platform\n\nInclude specific campaign structure with ad set breakdown.\`
+        brief + `\n\nAs the Paid Social Strategist, design a full-funnel paid social program. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. Platform Selection & Rationale\n2. Full-Funnel Campaign Architecture\n3. Audience Strategy per Platform\n4. Budget Allocation\n5. Creative Format Recommendations\n6. B2B/B2C Tactics\n7. Measurement & Attribution\n8. ROAS / CPL Targets\n\nInclude campaign structure with ad set breakdown.`
       ),
 
       callClaude(AGENT_PROGRAMMATIC,
-        briefBase + \`\n\nAs the Programmatic & Display Buyer, design a display and programmatic strategy. \${isShort ? 'Provide a concise display strategy.' : 'Cover:'}\n\n1. Channel Mix Recommendation (GDN vs DSP vs Partner Media vs ABM Display)\n2. Audience-First Buying Strategy\n3. Managed Placement Curation (high-value placement categories)\n4. Partner Media Outreach Strategy (newsletter/sponsored content)\n5. ABM Display Program (if applicable — account list targeting)\n6. Creative Format & Size Recommendations\n7. Brand Safety & Viewability Standards\n8. Budget Allocation & CPM Targets\n9. Upper-Funnel Measurement Framework\n\nInclude viewability benchmarks and frequency cap recommendations.\`
+        brief + `\n\nAs the Programmatic & Display Buyer, design a display strategy. ${isShort ? 'Provide a concise summary.' : 'Cover:'}\n\n1. Channel Mix (GDN vs DSP vs Partner Media vs ABM)\n2. Audience-First Buying Strategy\n3. Managed Placement Curation\n4. Partner Media Strategy\n5. ABM Display Program\n6. Creative Formats & Sizes\n7. Brand Safety & Viewability\n8. Budget & CPM Targets\n9. Upper-Funnel Measurement\n\nInclude viewability benchmarks.`
       )
 
     ]);
 
     clearInterval(keepAlive);
-    console.log('All 7 stages complete. Chars:', s1.length, s2.length, s3.length, s4.length, s5.length, s6.length, s7.length);
+    console.log('All 7 stages done. Chars:', s1.length, s2.length, s3.length, s4.length, s5.length, s6.length, s7.length);
 
-    const report = \`PAID MEDIA INTELLIGENCE REPORT
-Campaign Brief: \${topic}
-Generated: \${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Final normalization pass — convert any surviving literal \n to real newlines
+    const normalize = (s) => { let p='', t=s; while(p!==t){p=t;t=t.split('\\n').join('\n');} return t; };
 
-EXECUTIVE SUMMARY
-
-This report delivers a comprehensive paid media analysis across 7 specialist divisions covering account health, data integrity, search intent, campaign architecture, creative performance, social media advertising, and programmatic media buying. Key findings and prioritized recommendations are synthesized below for immediate action.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-STAGE 01 — ACCOUNT HEALTH REVIEW
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-\${s1}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-STAGE 02 — DATA INTEGRITY & ATTRIBUTION AUDIT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-\${s2}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-STAGE 03 — SEARCH INTENT & QUERY PERFORMANCE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-\${s3}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-STAGE 04 — CAMPAIGN ARCHITECTURE & GROWTH STRATEGY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-\${s4}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-STAGE 05 — CREATIVE PERFORMANCE & MESSAGING STRATEGY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-\${s5}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-STAGE 06 — SOCIAL MEDIA ADVERTISING STRATEGY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-\${s6}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-STAGE 07 — PROGRAMMATIC MEDIA & DISPLAY BUYING
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-\${s7}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-END OF REPORT · Paid Media Intelligence · Confidential
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\`;
+    const report = [
+      'PAID MEDIA INTELLIGENCE REPORT',
+      'Campaign Brief: ' + topic,
+      'Generated: ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      '',
+      'EXECUTIVE SUMMARY',
+      '',
+      'This report delivers a comprehensive paid media analysis across 7 specialist divisions.',
+      '',
+      'STAGE 01 — ACCOUNT HEALTH REVIEW',
+      normalize(s1),
+      '',
+      'STAGE 02 — DATA INTEGRITY & ATTRIBUTION AUDIT',
+      normalize(s2),
+      '',
+      'STAGE 03 — SEARCH INTENT & QUERY PERFORMANCE',
+      normalize(s3),
+      '',
+      'STAGE 04 — CAMPAIGN ARCHITECTURE & GROWTH STRATEGY',
+      normalize(s4),
+      '',
+      'STAGE 05 — CREATIVE PERFORMANCE & MESSAGING STRATEGY',
+      normalize(s5),
+      '',
+      'STAGE 06 — SOCIAL MEDIA ADVERTISING STRATEGY',
+      normalize(s6),
+      '',
+      'STAGE 07 — PROGRAMMATIC MEDIA & DISPLAY BUYING',
+      normalize(s7),
+      '',
+      'END OF REPORT · Paid Media Intelligence · Confidential'
+    ].join('\n');
 
     usage.used += 1;
-    console.log('Sending report, chars:', report.length);
+    console.log('Report chars:', report.length);
 
-    // Send the final payload as a JSON line — frontend detects END: prefix
     const payload = JSON.stringify({
       report,
       usage: { used: usage.used, limit: usage.limit, remaining: usage.limit - usage.used }
@@ -485,9 +432,28 @@ END OF REPORT · Paid Media Intelligence · Confidential
   } catch (e) {
     clearInterval(keepAlive);
     console.error('Pipeline error:', e.message);
-    const errPayload = JSON.stringify({ error: 'Pipeline error: ' + e.message });
-    res.write('END:' + errPayload + '\n');
+    res.write('END:' + JSON.stringify({ error: 'Pipeline error: ' + e.message }) + '\n');
     res.end();
+  }
+});
+
+// ─────────────────────────────────────────────
+// TEST ENDPOINT
+// ─────────────────────────────────────────────
+app.get('/api/test', async (req, res) => {
+  const key = process.env.CLAUDE_API_KEY;
+  if (!key) return res.json({ ok: false, error: 'CLAUDE_API_KEY not set' });
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-5-20250929', max_tokens: 20, messages: [{ role: 'user', content: 'Say OK' }] })
+    });
+    const d = await r.json();
+    if (d.error) return res.json({ ok: false, error: d.error.message });
+    return res.json({ ok: true, reply: d.content?.[0]?.text, model: d.model });
+  } catch (e) {
+    return res.json({ ok: false, error: e.message });
   }
 });
 
