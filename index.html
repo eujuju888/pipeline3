@@ -263,7 +263,6 @@ async function runPipeline(){
         format:document.getElementById("fmtSelect").value
       })
     });
-    // Streaming read — server sends KEEPALIVE lines then END:{json}
     const reader=res.body.getReader();
     const decoder=new TextDecoder();
     let buffer="";
@@ -272,7 +271,8 @@ async function runPipeline(){
       const {done,value}=await reader.read();
       if(done) break;
       buffer+=decoder.decode(value,{stream:true});
-      const lines=buffer.split("\n");
+      const lines=buffer.split("
+");
       buffer=lines.pop();
       for(const line of lines){
         if(line.startsWith("END:")){
@@ -282,10 +282,8 @@ async function runPipeline(){
       }
       if(data) break;
     }
-    if(!data&&buffer.startsWith("END:")){
-      try{data=JSON.parse(buffer.slice(4));}catch(e){}
-    }
-    if(!data){showError("No response from server. Check Railway logs.");document.getElementById("reportLoading").style.display="none";btn.disabled=false;btn.textContent="▶ Generate Report";return;}
+    if(!data&&buffer.startsWith("END:")){try{data=JSON.parse(buffer.slice(4));}catch(e){}}
+    if(!data){showError("No response from server.");document.getElementById("reportLoading").style.display="none";btn.disabled=false;btn.textContent="▶ Generate Report";return;}
     if(data.error){showError(data.error);document.getElementById("reportLoading").style.display="none";btn.disabled=false;btn.textContent="▶ Generate Report";return;}
     if(!data.report){showError("Empty report received.");document.getElementById("reportLoading").style.display="none";btn.disabled=false;btn.textContent="▶ Generate Report";return;}
     currentReport=data.report;
@@ -299,10 +297,7 @@ async function runPipeline(){
     document.getElementById("reportBody").textContent=currentReport;
     document.getElementById("reportActions").style.display="grid";
     document.getElementById("reportHint").style.display="block";
-  }catch(e){
-    showError("Connection error: "+e.message);
-    document.getElementById("reportLoading").style.display="none";
-  }
+  }catch(e){showError("Connection error: "+e.message);document.getElementById("reportLoading").style.display="none";}
   btn.disabled=false;btn.textContent="▶ Generate Report";
 }
 
@@ -431,8 +426,8 @@ function openPDF(){
 
   const TH=THEMES[Math.floor(Math.random()*THEMES.length)];
 
-  const safeReport=JSON.stringify(currentReport).replace(/`/g,"\\`").replace(/\$\{/g,"\\${");
-  const safeTopic=JSON.stringify(currentTopic).replace(/`/g,"\\`").replace(/\$\{/g,"\\${");
+  const safeReport=JSON.stringify(currentReport).replace(/`/g,"\\`").replace(/\$\{/g,"\\${").replace(/<\/script>/gi,"<\\/script>");
+  const safeTopic=JSON.stringify(currentTopic).replace(/`/g,"\\`").replace(/\$\{/g,"\\${").replace(/<\/script>/gi,"<\\/script>");
 
   const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Paid Media Intelligence Report</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -514,7 +509,7 @@ function cleanMd(s){
   return s;
 }
 
-const lines=R.replace(/\\\\n/g,"\n").split("\n");
+const lines=R.split("\\n");
 let allLines=[];
 let inTable=false;
 let execLines=[];
