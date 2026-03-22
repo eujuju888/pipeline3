@@ -283,13 +283,18 @@ async function callClaude(systemPrompt, userPrompt) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 10000,
+      max_tokens: 8000,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }]
     })
   });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`API HTTP ${response.status}: ${errText.substring(0, 300)}`);
+  }
   const data = await response.json();
   if (data.error) throw new Error(data.error.message || 'Claude API error');
+  if (!data.content || !data.content[0]) throw new Error('Empty response from Claude API');
   return data.content[0].text;
 }
 
@@ -297,6 +302,10 @@ async function callClaude(systemPrompt, userPrompt) {
 // MAIN PIPELINE ENDPOINT
 // ─────────────────────────────────────────────
 app.post('/api/generate', async (req, res) => {
+  // Extend timeout to 10 minutes — 7 Claude API calls take 2-5 min total
+  req.socket.setTimeout(600000);
+  res.setTimeout(600000);
+
   const { licenseKey, topic, language, format } = req.body;
   if (!licenseKey || !topic) return res.json({ error: 'Missing license key or topic.' });
 
@@ -329,41 +338,58 @@ app.post('/api/generate', async (req, res) => {
 - Keep all content as readable plain text only`;
 
   try {
+    console.log('Pipeline starting for topic:', topic.substring(0, 80));
+
     // ── STAGE 1: Account Audit ──
+    console.log('Stage 1 starting...');
     const s1 = await callClaude(AGENT_AUDITOR,
       `Campaign Brief: ${topic}${langNote}${formatNote}\n\nAs the Paid Media Auditor, conduct a comprehensive account audit. ${isShort ? 'Provide a concise audit summary.' : 'Provide a full 200+ checkpoint assessment covering:'}\n\n1. Account Structure Assessment\n2. Tracking & Measurement Review\n3. Bidding & Budget Evaluation\n4. Keyword & Targeting Analysis\n5. Creative & Ad Copy Review\n6. Competitive Positioning\n7. Priority Fix List (Critical / High / Medium / Low severity)\n8. Estimated efficiency improvement opportunity\n\nFormat with clear sections and actionable findings.`
     );
 
+    console.log('Stage 1 done,', s1.length, 'chars');
+    console.log('Stage 2 starting...');
     // ── STAGE 2: Tracking & Measurement ──
     const s2 = await callClaude(AGENT_TRACKING,
       `Campaign Brief: ${topic}${langNote}${formatNote}\n\nAudit findings from Stage 1:\n${s1}\n\nAs the Tracking & Measurement Specialist, conduct a deep tracking audit. ${isShort ? 'Provide a concise tracking summary.' : 'Cover:'}\n\n1. GTM Container Health\n2. GA4 Event Configuration\n3. Google Ads Conversion Tracking\n4. Meta Pixel & CAPI Setup\n5. Cross-Platform Attribution\n6. Server-Side Tagging Recommendations\n7. Privacy & Consent Compliance\n8. Specific fixes with implementation steps\n\nFlag any tracking issues that are misleading bidding algorithms.`
     );
 
+    console.log('Stage 2 done,', s2.length, 'chars');
+    console.log('Stage 3 starting...');
     // ── STAGE 3: Search Query Analysis ──
     const s3 = await callClaude(AGENT_SEARCH_QUERY,
       `Campaign Brief: ${topic}${langNote}${formatNote}\n\nPrevious findings:\n- Audit: ${s1.substring(0, 400)}...\n- Tracking: ${s2.substring(0, 300)}...\n\nAs the Search Query Analyst, perform a search query analysis. ${isShort ? 'Provide a concise query analysis.' : 'Cover:'}\n\n1. Likely Wasted Spend Patterns (irrelevant query categories)\n2. Negative Keyword Recommendations (account/campaign/ad group level)\n3. Intent Classification Map (informational vs commercial vs transactional)\n4. Match Type Optimization Recommendations\n5. Query Sculpting Strategy\n6. High-Intent Opportunity Keywords to Expand\n7. Estimated wasted spend percentage to recover\n\nProvide specific negative keyword lists and match type guidance.`
     );
 
+    console.log('Stage 3 done,', s3.length, 'chars');
+    console.log('Stage 4 starting...');
     // ── STAGE 4: PPC Campaign Strategy ──
     const s4 = await callClaude(AGENT_PPC,
       `Campaign Brief: ${topic}${langNote}${formatNote}\n\nPrevious analysis:\n- Audit: ${s1.substring(0, 300)}...\n- Tracking: ${s2.substring(0, 200)}...\n- Query Analysis: ${s3.substring(0, 300)}...\n\nAs the PPC Campaign Strategist, build a comprehensive PPC strategy. ${isShort ? 'Provide a concise PPC strategy.' : 'Cover:'}\n\n1. Recommended Account Architecture (campaign tiers: brand/non-brand/competitor/conquest)\n2. Bidding Strategy Selection (tCPA vs tROAS vs Max Conversions — with rationale)\n3. Budget Allocation Framework across campaigns\n4. Keyword Strategy & Match Type Approach\n5. Campaign Type Recommendations (Search vs PMax vs Shopping)\n6. Audience Strategy (Customer Match, in-market, remarketing)\n7. Cross-Platform Budget Split (Google / Microsoft / Amazon)\n8. 90-Day Optimization Roadmap\n\nInclude RICE scoring table for prioritized actions.`
     );
 
+    console.log('Stage 4 done,', s4.length, 'chars');
+    console.log('Stage 5 starting...');
     // ── STAGE 5: Ad Creative Strategy ──
     const s5 = await callClaude(AGENT_CREATIVE,
       `Campaign Brief: ${topic}${langNote}${formatNote}\n\nPPC Strategy from Stage 4:\n${s4.substring(0, 500)}...\n\nAs the Ad Creative Strategist, develop a complete creative strategy. ${isShort ? 'Provide a concise creative strategy.' : 'Cover:'}\n\n1. RSA Headline Framework (15 headline categories: brand/benefit/feature/CTA/social proof)\n2. Sample RSA Headlines (at least 10 specific headlines)\n3. RSA Description Copy (4 description variations)\n4. Ad Extension Strategy (sitelinks, callouts, structured snippets)\n5. Meta Ad Creative Framework (hook-body-CTA structure)\n6. Performance Max Asset Group Recommendations\n7. Creative Testing Plan (what to test, success criteria, timeline)\n8. Competitive Creative Differentiation Strategy\n\nProvide actual ad copy examples, not just guidelines.`
     );
 
+    console.log('Stage 5 done,', s5.length, 'chars');
+    console.log('Stage 6 starting...');
     // ── STAGE 6: Paid Social Strategy ──
     const s6 = await callClaude(AGENT_PAID_SOCIAL,
       `Campaign Brief: ${topic}${langNote}${formatNote}\n\nSearch strategy: ${s4.substring(0, 300)}...\nCreative direction: ${s5.substring(0, 300)}...\n\nAs the Paid Social Strategist, design a full-funnel paid social program. ${isShort ? 'Provide a concise social strategy.' : 'Cover:'}\n\n1. Platform Selection & Rationale (Meta vs LinkedIn vs TikTok vs others)\n2. Full-Funnel Campaign Architecture (Prospecting → Engagement → Retargeting → Retention)\n3. Audience Strategy per Platform (custom audiences, lookalikes, exclusions)\n4. Budget Allocation Across Platforms & Funnel Stages\n5. Creative Format Recommendations per Platform\n6. B2B/B2C Specific Tactics (ABM if applicable)\n7. Measurement & Attribution Setup\n8. ROAS / CPL Targets by Platform\n\nInclude specific campaign structure with ad set breakdown.`
     );
 
+    console.log('Stage 6 done,', s6.length, 'chars');
+    console.log('Stage 7 starting...');
     // ── STAGE 7: Programmatic & Display ──
     const s7 = await callClaude(AGENT_PROGRAMMATIC,
       `Campaign Brief: ${topic}${langNote}${formatNote}\n\nSearch strategy: ${s4.substring(0, 250)}...\nSocial strategy: ${s6.substring(0, 250)}...\n\nAs the Programmatic & Display Buyer, design a display and programmatic strategy. ${isShort ? 'Provide a concise display strategy.' : 'Cover:'}\n\n1. Channel Mix Recommendation (GDN vs DSP vs Partner Media vs ABM Display)\n2. Audience-First Buying Strategy\n3. Managed Placement Curation (high-value placement categories)\n4. Partner Media Outreach Strategy (newsletter/sponsored content)\n5. ABM Display Program (if applicable — account list targeting)\n6. Creative Format & Size Recommendations\n7. Brand Safety & Viewability Standards\n8. Budget Allocation & CPM Targets\n9. Upper-Funnel Measurement Framework\n\nInclude viewability benchmarks and frequency cap recommendations.`
     );
 
+    console.log('Stage 7 done, chars:', s7.length);
+    console.log('Assembling final report...');
     // ── ASSEMBLE FINAL REPORT ──
     const report = `PAID MEDIA INTELLIGENCE REPORT
 Campaign Brief: ${topic}
