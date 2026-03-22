@@ -1,7 +1,7 @@
 {
   "name": "paid-media-pipeline",
   "version": "1.0.0",
-  "description": "Paid Media Intelligence Pipeline — 7 specialist agents powered by Claude AI",
+  "description": "Paid Media Intelligence — 7 specialist divisions powered by Claude AI",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

@@ -1,20 +1,20 @@
-# Paid Media Intelligence Pipeline
+# Paid Media Intelligence
 
-A 7-agent AI pipeline powered by Claude that generates comprehensive paid media strategy reports. Built for Railway.app deployment.
+A 7-division AI report powered by Claude that generates comprehensive paid media strategy reports. Built for Railway.app deployment.
 
 ---
 
-## Pipeline Agents
+## Analysis Divisions
 
-| Stage | Agent | Specialty |
-|-------|-------|-----------|
-| 01 | Paid Media Auditor | 200+ checkpoint account audit |
-| 02 | Tracking & Measurement Specialist | GTM, GA4, CAPI, attribution |
-| 03 | Search Query Analyst | Intent mapping, waste elimination |
-| 04 | PPC Campaign Strategist | Account architecture, bidding strategy |
-| 05 | Ad Creative Strategist | RSA, Meta creative, testing frameworks |
-| 06 | Paid Social Strategist | Meta, LinkedIn, TikTok full-funnel |
-| 07 | Programmatic & Display Buyer | GDN, DSP, ABM display |
+| Stage | Division | Specialty |
+|-------|----------|-----------|
+| 01 | Account Health Review | Structural evaluation, campaign efficiency, competitive positioning |
+| 02 | Data Integrity & Attribution Audit | Tag management, conversion accuracy, cross-platform attribution |
+| 03 | Search Intent & Query Performance | Intent classification, waste elimination, keyword opportunities |
+| 04 | Campaign Architecture & Growth Strategy | Account structure, bidding framework, budget allocation |
+| 05 | Creative Performance & Messaging Strategy | Ad copy evaluation, RSA architecture, creative testing |
+| 06 | Social Media Advertising Strategy | Full-funnel social, audience engineering, platform execution |
+| 07 | Programmatic Media & Display Buying | Display strategy, DSP planning, partner media, ABM targeting |
 
 ---
 
@@ -22,8 +22,8 @@ A 7-agent AI pipeline powered by Claude that generates comprehensive paid media 
 
 ### Step 1 — Fork or Clone
 ```bash
-git clone https://github.com/yourusername/paid-media-pipeline.git
-cd paid-media-pipeline
+git clone https://github.com/yourusername/paid-media-intelligence.git
+cd paid-media-intelligence
 ```
 
 ### Step 2 — Set Environment Variables in Railway
@@ -50,18 +50,18 @@ railway up
 
 | Variable | Description |
 |----------|-------------|
-| `CLAUDE_API_KEY` | Anthropic Claude API key |
-| `LS_API_KEY` | LemonSqueezy API key for license validation |
-| `PORT` | Auto-set by Railway |
+| `CLAUDE_API_KEY` | Anthropic Claude API key — get from console.anthropic.com |
+| `LS_API_KEY` | LemonSqueezy API key — get from app.lemonsqueezy.com → Settings → API |
+| `PORT` | Auto-set by Railway, do not set manually |
 
 ---
 
 ## File Structure
 
 ```
-paid-media-pipeline/
+paid-media-intelligence/
 ├── index.html          # Frontend UI
-├── server.js           # Backend + all 7 agent prompts
+├── server.js           # Backend + all 7 division prompts
 ├── package.json        # Node.js dependencies
 ├── railway.json        # Railway deployment config
 ├── .gitignore          # Git ignore rules

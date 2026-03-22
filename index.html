@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paid Media Intelligence </title>
+<title>Paid Media Intelligence</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;min-height:100vh}
@@ -432,9 +432,21 @@ for(let i=0;i<lines.length;i++){
 }
 
 function renderLines(arr){
-  let out="";let tbl=false;
+  let out="";let tbl=false;let inCode=false;let codeBuf="";
   for(const raw of arr){
     const l=raw.trim();
+    // CODE BLOCK HANDLING
+    if(l.startsWith("```")){
+      if(!inCode){
+        if(tbl){out+="</tbody></table>";tbl=false;}
+        inCode=true;codeBuf="";
+      } else {
+        out+="<pre style='background:#1e1e1e;color:#d4d4d4;padding:10px 14px;font-size:8.5pt;line-height:1.55;border-radius:4px;margin:8px 0 10px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace'>"+codeBuf.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</pre>";
+        inCode=false;codeBuf="";
+      }
+      continue;
+    }
+    if(inCode){codeBuf+=(codeBuf?"\n":"")+raw;continue;}
     if(!l){if(tbl){out+="</tbody></table>";tbl=false;}continue;}
     if(l.startsWith("━")||l.startsWith("===")||l.startsWith("---")) continue;
     if(/^#{1,3}\\s+/.test(l)){if(tbl){out+="</tbody></table>";tbl=false;}out+=cleanMd(l);continue;}
@@ -452,6 +464,7 @@ function renderLines(arr){
     out+="<div class='body-text'>"+cleanMd(l)+"</div>";
   }
   if(tbl) out+="</tbody></table>";
+  if(inCode&&codeBuf) out+="<pre style='background:#1e1e1e;color:#d4d4d4;padding:10px 14px;font-size:8.5pt;line-height:1.55;border-radius:4px;margin:8px 0 10px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace'>"+codeBuf.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</pre>";
   return out;
 }
 
@@ -469,6 +482,7 @@ let html=op(coverPage);
 let pg="";
 inTable=false;
 let skipUntilS1=true;
+let inCodeBlock=false;let codeBuffer="";
 
 for(let i=0;i<lines.length;i++){
   const raw=lines[i];
@@ -477,6 +491,18 @@ for(let i=0;i<lines.length;i++){
     if(l.includes("STAGE 01")) skipUntilS1=false;
     else continue;
   }
+  // CODE BLOCK DETECTION
+  if(l.startsWith("```")){
+    if(!inCodeBlock){
+      if(inTable){pg+="</tbody></table>";inTable=false;}
+      inCodeBlock=true;codeBuffer="";
+    } else {
+      pg+="<pre style='background:#1e1e1e;color:#d4d4d4;padding:10px 14px;font-size:8.5pt;line-height:1.55;border-radius:4px;margin:8px 0 10px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace'>"+codeBuffer.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</pre>";
+      inCodeBlock=false;codeBuffer="";
+    }
+    continue;
+  }
+  if(inCodeBlock){codeBuffer+=(codeBuffer?"\n":"")+raw;continue;}
   if(!l){if(inTable){pg+="</tbody></table>";inTable=false;}continue;}
   let sk=null;
   for(const k of Object.keys(SM)){if(l.includes(k)){sk=k;break;}}
@@ -503,6 +529,7 @@ for(let i=0;i<lines.length;i++){
   pg+="<div class='body-text'>"+cleanMd(l)+"</div>";
 }
 if(inTable){pg+="</tbody></table>";}
+if(inCodeBlock&&codeBuffer){pg+="<pre style='background:#1e1e1e;color:#d4d4d4;padding:10px 14px;font-size:8.5pt;line-height:1.55;border-radius:4px;margin:8px 0 10px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace'>"+codeBuffer.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</pre>";}
 if(pg)html+=op(pg);
 
 html+=op(
